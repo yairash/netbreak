@@ -134,6 +134,12 @@ async function autoSavePage() {
 				await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
 			}
 			const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
+			//test
+			console.log("document: \n");
+			console.log(document);
+			console.log("docData: \n");
+			console.log(docData);
+			//end of test
 			savePage(docData, frames);
 			if (framesSessionId) {
 				singlefile.processors.frameTree.cleanup(framesSessionId);
