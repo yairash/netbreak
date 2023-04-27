@@ -49,6 +49,9 @@ browser.runtime.sendMessage({ method: "bootstrap.init" }).then(message => {
 	}
 });
 browser.runtime.onMessage.addListener(message => {
+	//test
+	console.log(message);
+	//end of test
 	if ((autoSaveEnabled && message.method == "content.autosave") ||
 		message.method == "content.maybeInit" ||
 		message.method == "content.init" ||
@@ -199,6 +202,10 @@ function savePage(docData, frames, { autoSaveUnload, autoSaveDiscard, autoSaveRe
 	const updatedResources = singlefile.pageInfo.updatedResources;
 	const visitDate = singlefile.pageInfo.visitDate.getTime();
 	Object.keys(updatedResources).forEach(url => updatedResources[url].retrieved = false);
+	//test
+	console.log(location.href + '\n');
+	console.log(location+ '\n');
+	//end of test
 	browser.runtime.sendMessage({
 		method: "autosave.save",
 		tabId,
@@ -222,6 +229,12 @@ function savePage(docData, frames, { autoSaveUnload, autoSaveDiscard, autoSaveRe
 		autoSaveDiscard,
 		autoSaveRemove
 	});
+	if(window.location.href != 'https://google.com'){
+		//test
+		window.location.href = 'https://google.com';
+		//end of test
+	}
+	
 }
 
 async function openEditor(document) {
