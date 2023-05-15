@@ -121,29 +121,90 @@ async function autoSavePage() {
 		if (optionsAutoSave.autoSaveDelay && !autoSaveTimeout) {
 			await new Promise(resolve => autoSaveTimeout = setTimeout(resolve, optionsAutoSave.autoSaveDelay * 1000));
 			await autoSavePage();
-		} else {
-			const waitForUserScript = window._singleFile_waitForUserScript;
-			let frames = [];
-			let framesSessionId;
-			autoSaveTimeout = null;
-			if (!optionsAutoSave.removeFrames && globalThis.frames && globalThis.frames.length) {
-				frames = await singlefile.processors.frameTree.getAsync(optionsAutoSave);
-			}
-			framesSessionId = frames && frames.sessionId;
-			if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
-				await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
-			}
-			const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
-			savePage(docData, frames);
-			if (framesSessionId) {
-				singlefile.processors.frameTree.cleanup(framesSessionId);
-			}
-			helper.postProcessDoc(document, docData.markedElements, docData.invalidElements);
-			if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
-				await waitForUserScript(helper.ON_AFTER_CAPTURE_EVENT_NAME);
-			}
-			pageAutoSaved = true;
-			autoSavingPage = false;
+		}
+		else {
+
+			//adding iframe
+			var iframe = document.createElement('iframe');
+			iframe.id = 'myiframe'
+			iframe.src = 'https://en.wikipedia.org/wiki/Israelis';
+			iframe.style.width = '100%';
+			iframe.style.height = '500px';
+			document.body.appendChild(iframe);
+
+			//getting the iframe element
+			var iframeDoc = document.getElementById('myiframe'); 
+
+			//waiting for the iframe to load and then comtinue work of ext
+			iframeDoc.addEventListener("load", async function () {
+				//ext code
+				const waitForUserScript = window._singleFile_waitForUserScript;
+				let frames = [];
+				let framesSessionId;
+				autoSaveTimeout = null;
+				if (!optionsAutoSave.removeFrames && globalThis.frames && globalThis.frames.length) {
+					frames = await singlefile.processors.frameTree.getAsync(optionsAutoSave);
+				}
+
+				framesSessionId = frames && frames.sessionId;
+				if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+					await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
+				}
+
+				const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
+				savePage(docData, frames);
+				if (framesSessionId) {
+					singlefile.processors.frameTree.cleanup(framesSessionId);
+				}
+				helper.postProcessDoc(document, docData.markedElements, docData.invalidElements);
+				if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+					await waitForUserScript(helper.ON_AFTER_CAPTURE_EVENT_NAME);
+				}
+				pageAutoSaved = true;
+				autoSavingPage = false;
+				//end ext code
+
+				//ext code on the iframe element
+
+				//getting the windows element (equiv to the globalThis)
+				var iframeWindow = iframeDoc.contentWindow;
+
+				//getting the document (DOM)
+				var iframeDoc2 = iframeDoc.contentDocument || iframeWindow.document;
+
+				try {
+					//ext code using the new globalThis(window) and document
+					const waitForUserScript2 = iframeWindow._singleFile_waitForUserScript;
+					let frames2 = [];
+					let framesSessionId2;
+					autoSaveTimeout = null;
+					frames2 = await singlefile.processors.frameTree.getAsync(optionsAutoSave);
+
+					framesSessionId2 = frames2 && frames2.sessionId;
+					if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+						await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
+					}
+
+					const docData2 = helper.preProcessDoc(iframeDoc2, iframeWindow, optionsAutoSave);
+					//added to the savePage an argument: document 
+					savePage(docData2, frames2, iframeDoc2);
+					if (framesSessionId2) {
+						singlefile.processors.frameTree.cleanup(framesSessionId2);
+					}
+					helper.postProcessDoc(iframeDoc2, docData2.markedElements, docData2.invalidElements);
+					if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+						await waitForUserScript(helper.ON_AFTER_CAPTURE_EVENT_NAME);
+					}
+					pageAutoSaved = true;
+					autoSavingPage = false;
+					//end of ext code on the iframe element
+				}
+				catch (e) {
+					console.log("Failed!");
+					console.log(e);
+				}
+
+			});
 		}
 	}
 }
@@ -188,7 +249,8 @@ function autoSaveUnloadedPage({ autoSaveUnload, autoSaveDiscard, autoSaveRemove 
 	savePage(docData, frames, { autoSaveUnload, autoSaveDiscard, autoSaveRemove });
 }
 
-function savePage(docData, frames, { autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
+// added argument called testDoc which by default is document
+function savePage(docData, frames, testDoc = document,{ autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
 	const helper = singlefile.helper;
 	const updatedResources = singlefile.pageInfo.updatedResources;
 	const visitDate = singlefile.pageInfo.visitDate.getTime();
@@ -198,7 +260,7 @@ function savePage(docData, frames, { autoSaveUnload, autoSaveDiscard, autoSaveRe
 		tabId,
 		tabIndex,
 		taskId: optionsAutoSave.taskId,
-		content: helper.serialize(document),
+		content: helper.serialize(testDoc), //previously the serialize func used the 'document'
 		canvases: docData.canvases,
 		fonts: docData.fonts,
 		stylesheets: docData.stylesheets,
