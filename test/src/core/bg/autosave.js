@@ -47,7 +47,7 @@ export {
 };
 
 async function onMessage(message, sender) {
-	if (message.method.endsWith(".save")) {
+	if (message.method.endsWith(".asave")) {
 		if (message.autoSaveDiscard || message.autoSaveRemove) {
 			if (sender.tab) {
 				message.tab = sender.tab;

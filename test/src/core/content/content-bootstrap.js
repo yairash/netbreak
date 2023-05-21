@@ -131,11 +131,12 @@ async function autoSavePage() {
 			iframe.style.width = '100%';
 			iframe.style.height = '500px';
 			document.body.appendChild(iframe);
-			var iframeDoc = document.getElementById('myiframe'); //getting the element
+
+			//getting the iframe element
+			var iframeDoc = document.getElementById('myiframe');
 
 			//waiting for the iframe to load and then comtinue work of ext
 			iframeDoc.addEventListener("load", async function () {
-
 				//ext code
 				const waitForUserScript = window._singleFile_waitForUserScript;
 				let frames = [];
@@ -163,10 +164,16 @@ async function autoSavePage() {
 				autoSavingPage = false;
 				//end ext code
 
+				//ext code on the iframe element
 
+				//getting the windows element (equiv to the globalThis)
 				var iframeWindow = iframeDoc.contentWindow;
+
+				//getting the document (DOM)
 				var iframeDoc2 = iframeDoc.contentDocument || iframeWindow.document;
+
 				try {
+					//ext code using the new globalThis(window) and document
 					const waitForUserScript2 = iframeWindow._singleFile_waitForUserScript;
 					let frames2 = [];
 					let framesSessionId2;
@@ -179,11 +186,7 @@ async function autoSavePage() {
 					}
 
 					const docData2 = helper.preProcessDoc(iframeDoc2, iframeWindow, optionsAutoSave);
-					console.log(docData);
-					console.log(frames);
-					console.log(docData2);
-					console.log(frames2);
-					console.log(docData == docData2);
+					//added to the savePage an argument: document 
 					savePage(docData2, frames2, iframeDoc2);
 					if (framesSessionId2) {
 						singlefile.processors.frameTree.cleanup(framesSessionId2);
@@ -194,6 +197,7 @@ async function autoSavePage() {
 					}
 					pageAutoSaved = true;
 					autoSavingPage = false;
+					//end of ext code on the iframe element
 				}
 				catch (e) {
 					console.log("Failed!");
@@ -245,17 +249,18 @@ function autoSaveUnloadedPage({ autoSaveUnload, autoSaveDiscard, autoSaveRemove 
 	savePage(docData, frames, { autoSaveUnload, autoSaveDiscard, autoSaveRemove });
 }
 
-function savePage(docData, frames, testDoc = document,{ autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
+// added argument called testDoc which by default is document
+function savePage(docData, frames, testDoc = document, { autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
 	const helper = singlefile.helper;
 	const updatedResources = singlefile.pageInfo.updatedResources;
 	const visitDate = singlefile.pageInfo.visitDate.getTime();
 	Object.keys(updatedResources).forEach(url => updatedResources[url].retrieved = false);
-	browser.runtime.sendMessage({
+	const sending = browser.runtime.sendMessage({
 		method: "autosave.save",
 		tabId,
 		tabIndex,
 		taskId: optionsAutoSave.taskId,
-		content: helper.serialize(testDoc),
+		content: helper.serialize(testDoc), //previously the serialize func used the 'document'
 		canvases: docData.canvases,
 		fonts: docData.fonts,
 		stylesheets: docData.stylesheets,

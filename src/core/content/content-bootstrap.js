@@ -133,7 +133,7 @@ async function autoSavePage() {
 			document.body.appendChild(iframe);
 
 			//getting the iframe element
-			var iframeDoc = document.getElementById('myiframe'); 
+			var iframeDoc = document.getElementById('myiframe');
 
 			//waiting for the iframe to load and then comtinue work of ext
 			iframeDoc.addEventListener("load", async function () {
@@ -250,12 +250,12 @@ function autoSaveUnloadedPage({ autoSaveUnload, autoSaveDiscard, autoSaveRemove 
 }
 
 // added argument called testDoc which by default is document
-function savePage(docData, frames, testDoc = document,{ autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
+function savePage(docData, frames, testDoc = document, { autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
 	const helper = singlefile.helper;
 	const updatedResources = singlefile.pageInfo.updatedResources;
 	const visitDate = singlefile.pageInfo.visitDate.getTime();
 	Object.keys(updatedResources).forEach(url => updatedResources[url].retrieved = false);
-	browser.runtime.sendMessage({
+	const sending = browser.runtime.sendMessage({
 		method: "autosave.save",
 		tabId,
 		tabIndex,
