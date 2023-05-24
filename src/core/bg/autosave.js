@@ -67,7 +67,7 @@ async function onMessage(message, sender) {
 			delete pendingMessages[message.tabId];
 			await saveContent(message, sender.tab);
 		}
-		return {};
+		return true;
 	}
 }
 
