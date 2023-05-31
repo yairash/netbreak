@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\test",
+    "\\test\\src",
+    "\\test\\src\\core",
+    "\\test\\src\\core\\content",
+    "\\test\\src\\core\\devtools",
+    "\\test\\src\\ui\\common",
+    "\\test\\src\\ui\\content",
+    "\\test\\src\\ui\\pages",
+    "\\test\\src\\ui\\resources"
+  ],
+  "SelectedNode": "\\test\\src\\core\\content\\content-bootstrap.js",
+  "PreviewInSolutionExplorer": false
+}

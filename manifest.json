@@ -1,7 +1,7 @@
 {
-	"name": "SingleFile",
-	"author": "Gildas Lormeau",
-	"homepage_url": "https://github.com/gildas-lormeau/SingleFile",
+	"name": "NetBreak",
+	"author": "Shanny Assa, Yair Ashkenazi, Yoav Geva",
+	"homepage_url": "https://github.com/yairash/netbreak",
 	"icons": {
 		"16": "src/ui/resources/icon_16.png",
 		"48": "src/ui/resources/icon_48.png",
