@@ -12,8 +12,8 @@
 		"description": "Command (Ctrl+Shift+U): 'Save all tabs'"
 	},
 	"menuSavePage": {
-		"message": "Save page with SingleFile",
-		"description": "Menu entry: 'Save page with SingleFile'"
+		"message": "Save current page with NetBreak",
+		"description": "Menu entry: 'Save current page with NetBreak'"
 	},
 	"menuSaveSelectedLinks": {
 		"message": "Save selected links",
@@ -57,7 +57,7 @@
 	},
 	"menuSaveTabs": {
 		"message": "Save tabs",
-		"description": "Menu entry (SingleFile button only): 'Save tabs'"
+		"description": "Menu entry (NetBreak button only): 'Save tabs'"
 	},
 	"menuSaveSelectedTabs": {
 		"message": "Save selected tabs",
@@ -96,20 +96,20 @@
 		"description": "Menu entry: 'Auto-save' > Auto-save all tabs'"
 	},
 	"buttonDefaultTooltip": {
-		"message": "Save page with SingleFile",
-		"description": "Button title: 'Save page with SingleFile'"
+		"message": "Save current page with NetBreak",
+		"description": "Button title: 'Save current page with NetBreak'"
 	},
 	"buttonBlockedBadge": {
 		"message": "🚫",
 		"description": "Button badge when the page is blocked: '🚫'"
 	},
 	"buttonBlockedTooltip": {
-		"message": "This page cannot be saved with SingleFile",
-		"description": "Button title: 'This page cannot be saved with SingleFile'"
+		"message": "This page cannot be saved with NetBreak",
+		"description": "Button title: 'This page cannot be saved with NetBreak'"
 	},
 	"buttonInitializingTooltip": {
-		"message": "Initializing SingleFile",
-		"description": "Button title during initialization: 'Initializing SingleFile (x/2)'"
+		"message": "Initializing NetBreak",
+		"description": "Button title during initialization: 'Initializing NetBreak (x/2)'"
 	},
 	"buttonInitializingBadge": {
 		"message": "•••",
@@ -452,8 +452,8 @@
 		"description": "Options page label: 'period (s)'"
 	},
 	"optionAutoSaveExternalSave": {
-		"message": "save the page with SingleFile Companion",
-		"description": "Options page label: 'save the page with SingleFile Companion'"
+		"message": "save the page with NetBreak Companion",
+		"description": "Options page label: 'save the page with NetBreak Companion'"
 	},
 	"optionsEditorSubTitle": {
 		"message": "Annotation editor",
@@ -468,8 +468,8 @@
 		"description": "Options page label: 'open saved pages in a new tab'"
 	},
 	"optionAutoOpenEditor": {
-		"message": "open pages saved with SingleFile in the annotation editor",
-		"description": "Options page label: 'open pages saved with SingleFile in the annotation editor'"
+		"message": "open pages saved with NetBreak in the annotation editor",
+		"description": "Options page label: 'open pages saved with NetBreak in the annotation editor'"
 	},
 	"optionDefaultEditorMode": {
 		"message": "default mode",
@@ -556,7 +556,7 @@
 		"description": "Options page label: 'add proof of existence'"
 	},
 	"optionsAddProofConfirm": {
-		"message": "Confirm you allow SingleFile to send to the Woleet API a SHA256 hash of each page you are going to save. You can find more information about this feature in the help page or by clicking on the question mark next to the option.",
+		"message": "Confirm you allow NetBreak to send to the Woleet API a SHA256 hash of each page you are going to save. You can find more information about this feature in the help page or by clicking on the question mark next to the option.",
 		"description": "Popup text displayed wen enabling the option 'add proof of existence'"
 	},
 	"optionWoleetKey": {
@@ -604,8 +604,8 @@
 		"description": "Options page label: 'password'"
 	},
 	"optionSaveWithCompanion": {
-		"message": "save with SingleFile Companion",
-		"description": "Options page label: 'save with SingleFile Companion'"
+		"message": "save with NetBreak Companion",
+		"description": "Options page label: 'save with NetBreak Companion'"
 	},
 	"optionSaveCreatedBookmarks": {
 		"message": "save the page of a newly created bookmark",
