@@ -42,7 +42,10 @@ browser.runtime.onMessage.addListener(message => {
 	}
 });
 
-async function onMessage(message) {
+async function onMessage(message, sender) {
+	console.log(message);
+	console.log(sender);
+	
 	if (!location.href.startsWith(MOZ_EXTENSION_PROTOCOL)) {
 		if (message.method == "content.save") {
 			await savePage(message);

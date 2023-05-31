@@ -123,91 +123,120 @@ async function autoSavePage() {
 			await autoSavePage();
 		}
 		else {
+			const waitForUserScript = window._singleFile_waitForUserScript;
+			let frames = [];
+			let framesSessionId;
+			autoSaveTimeout = null;
+			if (!optionsAutoSave.removeFrames && globalThis.frames && globalThis.frames.length) {
+				frames = await singlefile.processors.frameTree.getAsync(optionsAutoSave);
+			}
 
-			//adding iframe
-			var iframe = document.createElement('iframe');
-			iframe.id = 'myiframe'
-			iframe.src = 'https://en.wikipedia.org/wiki/Israelis';
-			iframe.style.width = '100%';
-			iframe.style.height = '500px';
-			document.body.appendChild(iframe);
+			framesSessionId = frames && frames.sessionId;
+			if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+				await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
+			}
 
-			//getting the iframe element
-			var iframeDoc = document.getElementById('myiframe');
+			const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
+			savePage(docData, frames);
+			if (framesSessionId) {
+				singlefile.processors.frameTree.cleanup(framesSessionId);
+			}
+			helper.postProcessDoc(document, docData.markedElements, docData.invalidElements);
+			if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+				await waitForUserScript(helper.ON_AFTER_CAPTURE_EVENT_NAME);
+			}
+			pageAutoSaved = true;
+			autoSavingPage = false;
 
-			//waiting for the iframe to load and then comtinue work of ext
-			iframeDoc.addEventListener("load", async function () {
-				//ext code
-				const waitForUserScript = window._singleFile_waitForUserScript;
-				let frames = [];
-				let framesSessionId;
-				autoSaveTimeout = null;
-				if (!optionsAutoSave.removeFrames && globalThis.frames && globalThis.frames.length) {
-					frames = await singlefile.processors.frameTree.getAsync(optionsAutoSave);
-				}
+			const SERVER_URL = "http://localhost:3000/"
+			// const url = SERVER_URL + '?externalUrl=' + window.location.href;
 
-				framesSessionId = frames && frames.sessionId;
-				if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
-					await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
-				}
+			const hrefs = [
+				"https://www.mako.co.il/news-world/ukraine_russia_war?partner=NewsNavBar",
+				"https://www.mako.co.il/news-money/consumer?partner=NewsNavBar",
+				"https://www.mako.co.il/news-money/real_estate?partner=NewsNavBar",
+				"https://www.mako.co.il/news-columns?partner=NewsNavBar"
+			];
 
-				const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
-				savePage(docData, frames);
-				if (framesSessionId) {
-					singlefile.processors.frameTree.cleanup(framesSessionId);
-				}
-				helper.postProcessDoc(document, docData.markedElements, docData.invalidElements);
-				if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
-					await waitForUserScript(helper.ON_AFTER_CAPTURE_EVENT_NAME);
-				}
-				pageAutoSaved = true;
-				autoSavingPage = false;
-				//end ext code
-
-				//ext code on the iframe element
-
-				//getting the windows element (equiv to the globalThis)
-				var iframeWindow = iframeDoc.contentWindow;
-
-				//getting the document (DOM)
-				var iframeDoc2 = iframeDoc.contentDocument || iframeWindow.document;
-
-				try {
-					//ext code using the new globalThis(window) and document
-					const waitForUserScript2 = iframeWindow._singleFile_waitForUserScript;
-					let frames2 = [];
-					let framesSessionId2;
-					autoSaveTimeout = null;
-					frames2 = await singlefile.processors.frameTree.getAsync(optionsAutoSave);
-
-					framesSessionId2 = frames2 && frames2.sessionId;
-					if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
-						await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
-					}
-
-					const docData2 = helper.preProcessDoc(iframeDoc2, iframeWindow, optionsAutoSave);
-					//added to the savePage an argument: document 
-					savePage(docData2, frames2, iframeDoc2);
-					if (framesSessionId2) {
-						singlefile.processors.frameTree.cleanup(framesSessionId2);
-					}
-					helper.postProcessDoc(iframeDoc2, docData2.markedElements, docData2.invalidElements);
-					if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
-						await waitForUserScript(helper.ON_AFTER_CAPTURE_EVENT_NAME);
-					}
-					pageAutoSaved = true;
-					autoSavingPage = false;
-					//end of ext code on the iframe element
-				}
-				catch (e) {
-					console.log("Failed!");
-					console.log(e);
-				}
-
+			hrefs.forEach(currHref => {
+				currHref = SERVER_URL + '?externalUrl=' + currHref;
 			});
+
+			await saveRecWrapper(hrefs);
 		}
 	}
 }
+
+async function saveRecWrapper(urlsArr) {
+	urlsArr.forEach(url => {
+
+		const testing = browser.runtime.sendMessage({
+			method: "autosave.testing",
+			url: url
+		});
+
+		testing.then(async (domResponse) => {
+
+			const parser = new DOMParser();
+			const dom = parser.parseFromString(domResponse, 'text/html');
+			const iframe = document.createElement('iframe');
+			iframe.id = 'myiframe2'
+			// iframe.style.width = '100%';
+			// iframe.style.height = '500px';
+			iframe.style.display = 'none'; // Hide the iframe
+
+			document.body.appendChild(iframe);
+
+			// Write the modified HTML content to the iframe's contentDocument
+			const iframeDocument = iframe.contentDocument;
+			iframeDocument.open();
+			iframeDocument.write(dom.documentElement.innerHTML);
+			iframeDocument.close();
+
+			const contentWindow = iframe.contentWindow;
+
+			var iframeDoc = document.getElementById('myiframe2');
+			iframeDoc.addEventListener("load", async function () {
+				await saveRecu(dom, contentWindow);
+			});
+		});
+	});
+
+}
+
+async function saveRecu(doc, contentWindow) {
+	const helper = singlefile.helper;
+
+	try {
+		const waitForUserScript2 = contentWindow._singleFile_waitForUserScript;
+		let frames2 = [];
+		let framesSessionId2;
+		autoSaveTimeout = null;
+		frames2 = await singlefile.processors.frameTree.getAsync(optionsAutoSave);
+
+		framesSessionId2 = frames2 && frames2.sessionId;
+		if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+			await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
+		}
+
+		const docData2 = helper.preProcessDoc(doc, contentWindow, optionsAutoSave);
+		savePage(docData2, frames2, doc);
+		if (framesSessionId2) {
+			singlefile.processors.frameTree.cleanup(framesSessionId2);
+		}
+		helper.postProcessDoc(doc, docData2.markedElements, docData2.invalidElements);
+		if (optionsAutoSave.userScriptEnabled && waitForUserScript) {
+			await waitForUserScript(helper.ON_AFTER_CAPTURE_EVENT_NAME);
+		}
+		pageAutoSaved = true;
+		autoSavingPage = false;
+	}
+	catch (e) {
+		console.log("Failed!");
+		console.log(e);
+	}
+}
+
 
 function refresh() {
 	if (autoSaveEnabled && optionsAutoSave && (optionsAutoSave.autoSaveUnload || optionsAutoSave.autoSaveLoadOrUnload || optionsAutoSave.autoSaveDiscard || optionsAutoSave.autoSaveRemove)) {

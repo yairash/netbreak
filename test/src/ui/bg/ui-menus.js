@@ -145,16 +145,16 @@ async function createMenus(tab) {
 			contexts: defaultContexts,
 			title: MENU_SAVE_PAGE_MESSAGE
 		});
-		menus.create({
-			id: MENU_ID_EDIT_AND_SAVE_PAGE,
-			contexts: defaultContexts,
-			title: MENU_EDIT_AND_SAVE_PAGE_MESSAGE
-		});
-		menus.create({
-			id: MENU_ID_SAVE_SELECTED_LINKS,
-			contexts: options.contextMenuEnabled ? defaultContextsDisabled.concat(["selection"]) : defaultContextsDisabled,
-			title: MENU_SAVE_SELECTED_LINKS
-		});
+		//menus.create({
+		//	id: MENU_ID_EDIT_AND_SAVE_PAGE,
+		//	contexts: defaultContexts,
+		//	title: MENU_EDIT_AND_SAVE_PAGE_MESSAGE
+		//});
+		//menus.create({
+		//	id: MENU_ID_SAVE_SELECTED_LINKS,
+		//	contexts: options.contextMenuEnabled ? defaultContextsDisabled.concat(["selection"]) : defaultContextsDisabled,
+		//	title: MENU_SAVE_SELECTED_LINKS
+		//});
 		if (Object.keys(profiles).length > 1) {
 			menus.create({
 				id: MENU_ID_SAVE_WITH_PROFILE,
@@ -169,65 +169,65 @@ async function createMenus(tab) {
 				type: "separator"
 			});
 		}
-		menus.create({
-			id: MENU_ID_SAVE_SELECTED,
-			contexts: defaultContexts,
-			title: MENU_SAVE_SELECTION_MESSAGE
-		});
-		if (options.contextMenuEnabled) {
-			menus.create({
-				id: MENU_ID_SAVE_FRAME,
-				contexts: ["frame"],
-				title: MENU_SAVE_FRAME_MESSAGE
-			});
-		}
-		menus.create({
-			id: MENU_ID_SAVE_TABS,
-			contexts: defaultContextsDisabled,
-			title: MENU_SAVE_TABS_MESSAGE
-		});
-		menus.create({
-			id: MENU_ID_BUTTON_SAVE_SELECTED_TABS,
-			contexts: defaultContextsDisabled,
-			title: MENU_SAVE_SELECTED_TABS_MESSAGE,
-			parentId: MENU_ID_SAVE_TABS
-		});
-		menus.create({
-			id: MENU_ID_BUTTON_SAVE_UNPINNED_TABS,
-			contexts: defaultContextsDisabled,
-			title: MENU_SAVE_UNPINNED_TABS_MESSAGE,
-			parentId: MENU_ID_SAVE_TABS
-		});
-		menus.create({
-			id: MENU_ID_BUTTON_SAVE_ALL_TABS,
-			contexts: defaultContextsDisabled,
-			title: MENU_SAVE_ALL_TABS_MESSAGE,
-			parentId: MENU_ID_SAVE_TABS
-		});
-		if (options.contextMenuEnabled) {
-			if (config.SELECTABLE_TABS_SUPPORTED) {
-				menus.create({
-					id: MENU_ID_SAVE_SELECTED_TABS,
-					contexts: pageContextsEnabled,
-					title: MENU_SAVE_SELECTED_TABS_MESSAGE
-				});
-			}
-			menus.create({
-				id: MENU_ID_SAVE_UNPINNED_TABS,
-				contexts: pageContextsEnabled,
-				title: MENU_SAVE_UNPINNED_TABS_MESSAGE
-			});
-			menus.create({
-				id: MENU_ID_SAVE_ALL_TABS,
-				contexts: pageContextsEnabled,
-				title: MENU_SAVE_ALL_TABS_MESSAGE
-			});
-			menus.create({
-				id: "separator-2",
-				contexts: pageContextsEnabled,
-				type: "separator"
-			});
-		}
+		//menus.create({
+		//	id: MENU_ID_SAVE_SELECTED,
+		//	contexts: defaultContexts,
+		//	title: MENU_SAVE_SELECTION_MESSAGE
+		//});
+		//if (options.contextMenuEnabled) {
+		//	menus.create({
+		//		id: MENU_ID_SAVE_FRAME,
+		//		contexts: ["frame"],
+		//		title: MENU_SAVE_FRAME_MESSAGE
+		//	});
+		//}
+		//menus.create({
+		//	id: MENU_ID_SAVE_TABS,
+		//	contexts: defaultContextsDisabled,
+		//	title: MENU_SAVE_TABS_MESSAGE
+		//});
+		//menus.create({
+		//	id: MENU_ID_BUTTON_SAVE_SELECTED_TABS,
+		//	contexts: defaultContextsDisabled,
+		//	title: MENU_SAVE_SELECTED_TABS_MESSAGE,
+		//	parentId: MENU_ID_SAVE_TABS
+		//});
+		//menus.create({
+		//	id: MENU_ID_BUTTON_SAVE_UNPINNED_TABS,
+		//	contexts: defaultContextsDisabled,
+		//	title: MENU_SAVE_UNPINNED_TABS_MESSAGE,
+		//	parentId: MENU_ID_SAVE_TABS
+		//});
+		//menus.create({
+		//	id: MENU_ID_BUTTON_SAVE_ALL_TABS,
+		//	contexts: defaultContextsDisabled,
+		//	title: MENU_SAVE_ALL_TABS_MESSAGE,
+		//	parentId: MENU_ID_SAVE_TABS
+		//});
+		//if (options.contextMenuEnabled) {
+		//	if (config.SELECTABLE_TABS_SUPPORTED) {
+		//		menus.create({
+		//			id: MENU_ID_SAVE_SELECTED_TABS,
+		//			contexts: pageContextsEnabled,
+		//			title: MENU_SAVE_SELECTED_TABS_MESSAGE
+		//		});
+		//	}
+		//	menus.create({
+		//		id: MENU_ID_SAVE_UNPINNED_TABS,
+		//		contexts: pageContextsEnabled,
+		//		title: MENU_SAVE_UNPINNED_TABS_MESSAGE
+		//	});
+		//	menus.create({
+		//		id: MENU_ID_SAVE_ALL_TABS,
+		//		contexts: pageContextsEnabled,
+		//		title: MENU_SAVE_ALL_TABS_MESSAGE
+		//	});
+		//	menus.create({
+		//		id: "separator-2",
+		//		contexts: pageContextsEnabled,
+		//		type: "separator"
+		//	});
+		//}
 		if (Object.keys(profiles).length > 1) {
 			menus.create({
 				id: MENU_ID_SELECT_PROFILE,
@@ -375,11 +375,11 @@ async function createMenus(tab) {
 				type: "separator"
 			});
 		}
-		menus.create({
-			id: MENU_ID_BATCH_SAVE_URLS,
-			contexts: defaultContexts,
-			title: MENU_BATCH_SAVE_URLS_MESSAGE
-		});
+		//menus.create({
+		//	id: MENU_ID_BATCH_SAVE_URLS,
+		//	contexts: defaultContexts,
+		//	title: MENU_BATCH_SAVE_URLS_MESSAGE
+		//});
 		menus.create({
 			id: MENU_ID_VIEW_PENDINGS,
 			contexts: defaultContexts,

@@ -46,7 +46,7 @@ export {
 	onTabReplaced
 };
 
-async function onMessage(message, sender) {
+async function onMessage(message, sender, sendResponse) {
 	if (message.method.endsWith(".save")) {
 		if (message.autoSaveDiscard || message.autoSaveRemove) {
 			if (sender.tab) {
@@ -69,6 +69,32 @@ async function onMessage(message, sender) {
 		}
 		return true;
 	}
+	else if (message.method.endsWith(".testing")) {
+		const dom = await sendGetRequest(message.url);
+		return dom;
+	}
+	return true;
+}
+
+function sendGetRequest(externalUrl) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		
+		xhr.open('GET', externalUrl);
+		xhr.onload = function () {
+			if (xhr.status === 200) {
+				resolve(xhr.responseText);
+			} else {
+				reject(new Error(`Request failed with status ${xhr.status}`));
+			}
+		};
+
+		xhr.onerror = function () {
+			reject(new Error('Request failed'));
+		};
+
+		xhr.send();
+	});
 }
 
 function onTabUpdated(tabId) {
