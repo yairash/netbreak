@@ -32,8 +32,8 @@
 		"description": "Menu entry: 'Save with profile'"
 	},
 	"menuViewPendingSaves": {
-		"message": "View pending saves...",
-		"description": "Menu entry: 'View pending saves...'"
+		"message": "View pending saves",
+		"description": "Menu entry: 'View pending saves'"
 	},
 	"menuSelectProfile": {
 		"message": "Select the default profile",
