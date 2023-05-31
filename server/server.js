@@ -44,7 +44,7 @@ async function savePage(url) {
     const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
 
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.goto(url, { waitUntil: 'networkidle0' });
     const domContent = await page.content();
     fs.writeFileSync('test.html', domContent);
 

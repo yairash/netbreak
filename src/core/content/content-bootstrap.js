@@ -152,19 +152,22 @@ async function autoSavePage() {
 			// const url = SERVER_URL + '?externalUrl=' + window.location.href;
 
 			const hrefs = [
-				"https://www.mako.co.il/news-world/ukraine_russia_war?partner=NewsNavBar",
-				"https://www.mako.co.il/news-money/consumer?partner=NewsNavBar",
-				"https://www.mako.co.il/news-money/real_estate?partner=NewsNavBar",
+				"https://www.mako.co.il/news-money/2022_q3/Article-f5b4a47535c3381027.htm?sCh=31750a2610f26110&pId=1714755246_359753",
+				"https://www.mako.co.il/news-israel/2023_q2/Article-42421a673737881026.htm?sCh=31750a2610f26110&pId=173113802",
+				"https://www.mako.co.il/news-politics/2023_q2/Article-c2785a72b437881026.htm?sCh=31750a2610f26110&pId=173113802",
 				"https://www.mako.co.il/news-columns?partner=NewsNavBar"
 			];
 
-			hrefs.forEach(currHref => {
-				currHref = SERVER_URL + '?externalUrl=' + currHref;
-			});
-
+			await addServerPrefix(SERVER_URL, hrefs);
 			await saveRecWrapper(hrefs);
 		}
 	}
+}
+
+async function addServerPrefix(serverUrl, hrefs) {
+	hrefs.forEach((currHref, index) => {
+		hrefs[index] = serverUrl + '?externalUrl=' + currHref;
+	});
 }
 
 async function saveRecWrapper(urlsArr) {
@@ -176,14 +179,13 @@ async function saveRecWrapper(urlsArr) {
 		});
 
 		testing.then(async (domResponse) => {
-
 			const parser = new DOMParser();
 			const dom = parser.parseFromString(domResponse, 'text/html');
 			const iframe = document.createElement('iframe');
 			iframe.id = 'myiframe2'
-			// iframe.style.width = '100%';
-			// iframe.style.height = '500px';
-			iframe.style.display = 'none'; // Hide the iframe
+			iframe.style.width = '100%';
+			iframe.style.height = '500px';
+			// iframe.style.display = 'none'; // Hide the iframe
 
 			document.body.appendChild(iframe);
 
