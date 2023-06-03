@@ -16,8 +16,9 @@
 			<span class="options-title">
 				<span id="expandAllButton"></span>
 				<span id="titleLabel"></span>
-				<a href="options.html#" target="_blank" class="new-window-link"><img
-						src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg=="></a>
+				<a href="options.html#" target="_blank" class="new-window-link">
+					<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==">
+				</a>
 			</span>
 			<span class="profiles">
 				<select id="profileNamesInput"></select>
@@ -160,7 +161,7 @@
 			</div>
 			<div class="option second-level">
 				<label for="loadDeferredImagesDispatchScrollEventInput"
-					id="loadDeferredImagesDispatchScrollEventLabel"></label>
+					   id="loadDeferredImagesDispatchScrollEventLabel"></label>
 				<input type="checkbox" id="loadDeferredImagesDispatchScrollEventInput">
 			</div>
 			<div class="option second-level">
@@ -437,8 +438,11 @@
 						<span class="th" id="autoSettingsUrlLabel"></span>
 						<span class="th" id="autoSettingsProfileLabel"></span>
 						<span class="th rule-autosave-profile" id="autoSettingsAutoSaveProfileLabel"></span>
-						<span class="th"><button id="rulesDeleteAllButton"><img
-									src="../resources/button_delete_all.png"></button></span>
+						<span class="th">
+							<button id="rulesDeleteAllButton">
+								<img src="../resources/button_delete_all.png">
+							</button>
+						</span>
 					</div>
 				</div>
 				<div class="rules-table">
@@ -448,25 +452,38 @@
 						<span class="td rule-url"></span>
 						<span class="td rule-profile"></span>
 						<span class="td rule-autosave-profile"></span>
-						<span class="td"><button class="rule-update-button"><img
-									src="../resources/button_edit.png"></button> <button class="rule-delete-button"><img
-									src="../resources/button_delete.png"></button></span>
+						<span class="td">
+							<button class="rule-update-button">
+								<img src="../resources/button_edit.png">
+							</button> <button class="rule-delete-button">
+								<img src="../resources/button_delete.png">
+							</button>
+						</span>
 					</div>
 					<form class="tr rule-create">
-						<span class="td rule-url"><input type="text" id="ruleUrlInput"
-								placeholder="Type a complete or partial URL (e.g. example.com)"></span>
+						<span class="td rule-url">
+							<input type="text" id="ruleUrlInput"
+								   placeholder="Type a complete or partial URL (e.g. example.com)">
+						</span>
 						<span class="td rule-profile"><select id="ruleProfileInput"></select></span>
 						<span class="td rule-autosave-profile"><select id="ruleAutoSaveProfileInput"></select></span>
-						<span class="td"><button id="ruleAddButton" disabled type="submit"><img
-									src="../resources/button_new.png"></button></span>
+						<span class="td">
+							<button id="ruleAddButton" disabled type="submit">
+								<img src="../resources/button_new.png">
+							</button>
+						</span>
 					</form>
 					<form hidden class="tr rule-edit">
 						<span class="td rule-url"><input type="text" id="ruleEditUrlInput"></span>
 						<span class="td rule-profile"><select id="ruleEditProfileInput"></select></span>
-						<span class="td rule-autosave-profile"><select
-								id="ruleEditAutoSaveProfileInput"></select></span>
-						<span class="td"><button id="ruleEditButton" type="submit"><img
-									src="../resources/button_ok.png"></button></span>
+						<span class="td rule-autosave-profile">
+							<select id="ruleEditAutoSaveProfileInput"></select>
+						</span>
+						<span class="td">
+							<button id="ruleEditButton" type="submit">
+								<img src="../resources/button_ok.png">
+							</button>
+						</span>
 					</form>
 				</div>
 			</div>
@@ -530,6 +547,83 @@
 	</main>
 	<script src="/lib/chrome-browser-polyfill.js"></script>
 	<script type="module" src="../bg/ui-options.js"></script>
+	<style>
+        #editorLabel,
+        #defaultEditorModeLabel,
+        #defaultEditorModeInput,
+        #applySystemThemeLabel,
+        #applySystemThemeInput,
+        #warnUnsavedPageLabel,
+        #warnUnsavedPageInput,
+        #openEditorLabel,
+        #openEditorInput,
+        #autoOpenEditorLabel,
+        #autoOpenEditorInput,
+        #miscLabel,
+        #addProofOption,
+        #woleetKeyOption,
+        #backgroundSaveOptions,
+        #displayStatsOption,
+        #destinationLabel,
+        #saveToFilesystemLabel,
+        #saveToFilesystemInput,
+        #saveToClipboardLabel,
+        #saveToClipboardInput,
+        #saveToGitHubLabel,
+        #saveToGitHubInput,
+        #githubTokenLabel,
+        #githubTokenInput,
+        #githubUserLabel,
+        #githubUserInput,
+        #githubRepositoryLabel,
+        #githubRepositoryInput,
+        #githubBranchLabel,
+        #githubBranchInput,
+        #saveWithWebDAVLabel,
+        #saveWithWebDAVInput,
+        #webDAVURLLabel,
+        #webDAVURLInput,
+        #webDAVUserLabel,
+        #webDAVUserInput,
+        #webDAVPasswordLabel,
+        #webDAVPasswordInput,
+        #saveToGDriveLabel,
+        #saveToGDriveInput,
+        #saveWithCompanionLabel,
+        #saveWithCompanionInput,
+        #filenameLabel,
+        #filenameTemplateLabel,
+        #filenameTemplateInput,
+        #filenameMaxLengthLabel,
+        #filenameMaxLengthInput,
+        #filenameMaxLengthUnitInput,
+        #confirmFilenameLabel,
+        #confirmFilenameInput,
+        #filenameConflictActionLabel,
+        #filenameConflictActionInput,
+        #bookmarksOptions,
+        #bookmarksLabel,
+        #saveCreatedBookmarksLabel,
+        #saveCreatedBookmarksInput,
+        #replaceBookmarkURLLabel,
+        #replaceBookmarkURLInput,
+        #ignoredBookmarkFoldersLabel,
+        #ignoredBookmarkFoldersInput,
+        #allowedBookmarkFoldersLabel,
+        #allowedBookmarkFoldersInput {
+            display: none;
+        }
+
+		#autoSettingsLabel,
+		.rules-table-container,
+		.option {
+			display: none;
+		}
+
+		.profiles button {
+			display: none;
+		}
+	</style>
 </body>
 
 </html>
