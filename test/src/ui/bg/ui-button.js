@@ -112,22 +112,22 @@ const BUTTON_STATES = {
 
 let business;
 
-browser.browserAction.onClicked.addListener(async tab => {
-	const highlightedTabs = await queryTabs({ currentWindow: true, highlighted: true });
-	if (highlightedTabs.length <= 1) {
-		toggleSaveTab(tab);
-	} else {
-		business.saveTabs(highlightedTabs);
-	}
+// browser.browserAction.onClicked.addListener(async tab => {
+// 	const highlightedTabs = await queryTabs({ currentWindow: true, highlighted: true });
+// 	if (highlightedTabs.length <= 1) {
+// 		toggleSaveTab(tab);
+// 	} else {
+// 		business.saveTabs(highlightedTabs);
+// 	}
 
-	function toggleSaveTab(tab) {
-		if (business.isSavingTab(tab)) {
-			business.cancelTab(tab.id);
-		} else {
-			business.saveTabs([tab]);
-		}
-	}
-});
+// 	function toggleSaveTab(tab) {
+// 		if (business.isSavingTab(tab)) {
+// 			business.cancelTab(tab.id);
+// 		} else {
+// 			business.saveTabs([tab]);
+// 		}
+// 	}
+// });
 
 export {
 	onMessage,
