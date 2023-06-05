@@ -150,60 +150,112 @@ async function autoSavePage() {
 
 			const SERVER_URL = "http://localhost:3000/fetchdom" // change to global veriable
 
-			// const recursiveUrls = await fetchRecursiveUrls();
+			const absoluteURLs = extractAbsoluteURLsFromDocument(document); // map tag:urls
+			let filteredURLs = filterURLsByDomain(document, absoluteURLs);
 
-			const hrefs = [
-				"https://www.mako.co.il/news-money/2022_q3/Article-f5b4a47535c3381027.htm?sCh=31750a2610f26110&pId=1714755246_359753"
-				// "https://www.mako.co.il/news-israel/2023_q2/Article-42421a673737881026.htm?sCh=31750a2610f26110&pId=173113802",
-				// "https://www.mako.co.il/news-politics/2023_q2/Article-c2785a72b437881026.htm?sCh=31750a2610f26110&pId=173113802",
-				// "https://www.mako.co.il/news-columns?partner=NewsNavBar"
-			];
+			// filteredURLs = [...filteredURLs.get("P")].slice(0, 10);
+			// const hrefs = [
+			// 	"https://www.mako.co.il/news-money/2022_q3/Article-f5b4a47535c3381027.htm?sCh=31750a2610f26110&pId=1714755246_359753"
+			// 	// "https://www.mako.co.il/news-israel/2023_q2/Article-42421a673737881026.htm?sCh=31750a2610f26110&pId=173113802",
+			// 	// "https://www.mako.co.il/news-politics/2023_q2/Article-c2785a72b437881026.htm?sCh=31750a2610f26110&pId=173113802",
+			// 	// "https://www.mako.co.il/news-columns?partner=NewsNavBar"
+			// ];
 
-			await addServerPrefix(SERVER_URL, hrefs); //change 2nd parameter to 'recursiveUrls'
-			await saveRecWrapper(hrefs); // change parameter to 'recursiveUrls'
+			await addServerPrefix(SERVER_URL, filteredURLs); //change 2nd parameter to 'recursiveUrls'
+			await saveRecWrapper(filteredURLs); // change parameter to 'recursiveUrls'
 		}
 	}
 }
 
-async function addServerPrefix(serverUrl, hrefs) {
-	hrefs.forEach((currHref, index) => {
-		hrefs[index] = serverUrl + '?externalUrl=' + currHref;
-	});
+function extractAbsoluteURLsFromDocument(document) {
+	let absoluteURLs = new Map();
+
+	function extract(element, parentTag) {
+		if (element.tagName === 'A' && element.href && (element.href.startsWith('http://') || element.href.startsWith('https://'))) {
+			const url = element.href;
+			if (!absoluteURLs.has(parentTag)) {
+				absoluteURLs.set(parentTag, new Array());
+			}
+			absoluteURLs.get(parentTag).push(url);
+		}
+
+		const children = element.children;
+		for (let i = 0; i < children.length; i++) {
+			extract(children[i], element.tagName);
+		}
+	}
+
+	extract(document.body, ''); // Pass the document's body as the initial element
+
+	return absoluteURLs;
 }
 
-async function saveRecWrapper(urlsArr) {
-	urlsArr.forEach(url => {
+function filterURLsByDomain(document, urlsMap) {
+	const currentDomain = document.location.hostname;
+	const filteredURLs = new Map();
 
-		const testing = browser.runtime.sendMessage({
-			method: "autosave.fetchdom",
-			url: url
+	urlsMap.forEach((urls, tag) => {
+		const filteredUrls = Array.from(urls).filter(url => {
+			const urlObj = new URL(url);
+			return urlObj.hostname === currentDomain;
 		});
 
-		testing.then(async (domResponse) => {
-			const parser = new DOMParser();
-			const dom = parser.parseFromString(domResponse, 'text/html');
-			const iframe = document.createElement('iframe');
-			iframe.id = 'myiframe2'
-			iframe.style.width = '100%';
-			iframe.style.height = '500px';
-			iframe.style.display = 'none'; // Hide the iframe
-
-			document.body.appendChild(iframe);
-
-			// Write the modified HTML content to the iframe's contentDocument
-			const iframeDocument = iframe.contentDocument;
-			iframeDocument.open();
-			iframeDocument.write(dom.documentElement.innerHTML);
-			iframeDocument.close();
-
-			const contentWindow = iframe.contentWindow;
-
-			var iframeDoc = document.getElementById('myiframe2');
-			iframeDoc.addEventListener("load", async function () {
-				await saveRecu(dom, contentWindow);
-			});
-		});
+		if (filteredUrls.length > 0) {
+			filteredURLs.set(tag, new Array(filteredUrls));
+		}
 	});
+
+	return filteredURLs;
+}
+
+async function addServerPrefix(serverUrl, tagMap) {
+	for (let [tag, currArr] of tagMap) {
+
+		for (let i = 0; i < currArr[0].length && i < 10; i++) {
+			currArr[0][i] = serverUrl + '?externalUrl=' + currArr[0][i];
+		}
+
+		tagMap.set(tag, currArr);
+	}
+
+}
+
+async function saveRecWrapper(tagMap) {
+	for (let [tag, currArr] of tagMap) {
+
+		for (let i = 0; i < currArr[0].length && i < 1; i++) {
+			console.log(currArr[0][i]);
+			const testing = browser.runtime.sendMessage({
+				method: "autosave.fetchdom",
+				url: currArr[0][i]
+			});
+
+			testing.then(async (domResponse) => {
+				const parser = new DOMParser();
+				const dom = parser.parseFromString(domResponse, 'text/html');
+				const iframe = document.createElement('iframe');
+				iframe.id = 'myiframe2'
+				iframe.style.width = '100%';
+				iframe.style.height = '500px';
+				iframe.style.display = 'none'; // Hide the iframe
+
+				document.body.appendChild(iframe);
+
+				// Write the modified HTML content to the iframe's contentDocument
+				const iframeDocument = iframe.contentDocument;
+				iframeDocument.open();
+				iframeDocument.write(dom.documentElement.innerHTML);
+				iframeDocument.close();
+
+				const contentWindow = iframe.contentWindow;
+
+				var iframeDoc = document.getElementById('myiframe2');
+				iframeDoc.addEventListener("load", async function () {
+					await saveRecu(dom, contentWindow);
+				});
+			});
+		}
+	}
 
 }
 
