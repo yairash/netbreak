@@ -69,14 +69,14 @@ async function onMessage(message, sender, sendResponse) {
 		}
 		return true;
 	}
-	else if (message.method.endsWith(".testing")) {
-		const dom = await sendGetRequest(message.url);
+	else if (message.method.endsWith(".fetchdom")) {
+		const dom = await fetchDomFromUrl(message.url);
 		return dom;
 	}
 	return true;
 }
 
-function sendGetRequest(externalUrl) {
+function fetchDomFromUrl(externalUrl) {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		

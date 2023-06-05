@@ -148,18 +148,19 @@ async function autoSavePage() {
 			pageAutoSaved = true;
 			autoSavingPage = false;
 
-			const SERVER_URL = "http://localhost:3000/"
-			// const url = SERVER_URL + '?externalUrl=' + window.location.href;
+			const SERVER_URL = "http://localhost:3000/fetchdom" // change to global veriable
+
+			// const recursiveUrls = await fetchRecursiveUrls();
 
 			const hrefs = [
-				"https://www.mako.co.il/news-money/2022_q3/Article-f5b4a47535c3381027.htm?sCh=31750a2610f26110&pId=1714755246_359753",
-				"https://www.mako.co.il/news-israel/2023_q2/Article-42421a673737881026.htm?sCh=31750a2610f26110&pId=173113802",
-				"https://www.mako.co.il/news-politics/2023_q2/Article-c2785a72b437881026.htm?sCh=31750a2610f26110&pId=173113802",
-				"https://www.mako.co.il/news-columns?partner=NewsNavBar"
+				"https://www.mako.co.il/news-money/2022_q3/Article-f5b4a47535c3381027.htm?sCh=31750a2610f26110&pId=1714755246_359753"
+				// "https://www.mako.co.il/news-israel/2023_q2/Article-42421a673737881026.htm?sCh=31750a2610f26110&pId=173113802",
+				// "https://www.mako.co.il/news-politics/2023_q2/Article-c2785a72b437881026.htm?sCh=31750a2610f26110&pId=173113802",
+				// "https://www.mako.co.il/news-columns?partner=NewsNavBar"
 			];
 
-			await addServerPrefix(SERVER_URL, hrefs);
-			await saveRecWrapper(hrefs);
+			await addServerPrefix(SERVER_URL, hrefs); //change 2nd parameter to 'recursiveUrls'
+			await saveRecWrapper(hrefs); // change parameter to 'recursiveUrls'
 		}
 	}
 }
@@ -174,7 +175,7 @@ async function saveRecWrapper(urlsArr) {
 	urlsArr.forEach(url => {
 
 		const testing = browser.runtime.sendMessage({
-			method: "autosave.testing",
+			method: "autosave.fetchdom",
 			url: url
 		});
 
@@ -185,7 +186,7 @@ async function saveRecWrapper(urlsArr) {
 			iframe.id = 'myiframe2'
 			iframe.style.width = '100%';
 			iframe.style.height = '500px';
-			// iframe.style.display = 'none'; // Hide the iframe
+			iframe.style.display = 'none'; // Hide the iframe
 
 			document.body.appendChild(iframe);
 
@@ -281,7 +282,7 @@ function autoSaveUnloadedPage({ autoSaveUnload, autoSaveDiscard, autoSaveRemove 
 }
 
 // added argument called testDoc which by default is document
-function savePage(docData, frames, testDoc = document, { autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
+function savePage(docData, frames, window = document, { autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
 	const helper = singlefile.helper;
 	const updatedResources = singlefile.pageInfo.updatedResources;
 	const visitDate = singlefile.pageInfo.visitDate.getTime();
@@ -291,7 +292,7 @@ function savePage(docData, frames, testDoc = document, { autoSaveUnload, autoSav
 		tabId,
 		tabIndex,
 		taskId: optionsAutoSave.taskId,
-		content: helper.serialize(testDoc), //previously the serialize func used the 'document'
+		content: helper.serialize(window), //previously the serialize func used the 'document'
 		canvases: docData.canvases,
 		fonts: docData.fonts,
 		stylesheets: docData.stylesheets,
