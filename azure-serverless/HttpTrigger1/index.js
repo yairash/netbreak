@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 
 module.exports = async function (context, req) {
 
@@ -6,7 +6,7 @@ module.exports = async function (context, req) {
     let domContent, responseMessage;
     try {
         const urlToFetch = req.query.externalUrl;
-        const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+        const browser = await puppeteer.launch({ headless: 'new', executablePath: "./chrome-linux64/chrome",args: ['--no-sandbox'] });
         const page = await browser.newPage();
         await page.goto(urlToFetch, { waitUntil: 'domcontentloaded' });
         domContent = await page.content();

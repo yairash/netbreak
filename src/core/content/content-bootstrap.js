@@ -148,20 +148,12 @@ async function autoSavePage() {
 			pageAutoSaved = true;
 			autoSavingPage = false;
 
-			const SERVER_URL = "http://localhost:3000/fetchdom" // change to global veriable
-
+			const AZURE_SERVERLESS_URL = "https://net-break.azurewebsites.net/api/httptrigger1" // change to global veriable
+			
 			const absoluteURLs = extractAbsoluteURLsFromDocument(document); // map tag:urls
 			let filteredURLs = filterURLsByDomain(document, absoluteURLs);
 
-			// filteredURLs = [...filteredURLs.get("P")].slice(0, 10);
-			// const hrefs = [
-			// 	"https://www.mako.co.il/news-money/2022_q3/Article-f5b4a47535c3381027.htm?sCh=31750a2610f26110&pId=1714755246_359753"
-			// 	// "https://www.mako.co.il/news-israel/2023_q2/Article-42421a673737881026.htm?sCh=31750a2610f26110&pId=173113802",
-			// 	// "https://www.mako.co.il/news-politics/2023_q2/Article-c2785a72b437881026.htm?sCh=31750a2610f26110&pId=173113802",
-			// 	// "https://www.mako.co.il/news-columns?partner=NewsNavBar"
-			// ];
-
-			await addServerPrefix(SERVER_URL, filteredURLs); //change 2nd parameter to 'recursiveUrls'
+			await addServerPrefix(AZURE_SERVERLESS_URL, filteredURLs); //change 2nd parameter to 'recursiveUrls'
 			await saveRecWrapper(filteredURLs); // change parameter to 'recursiveUrls'
 		}
 	}
