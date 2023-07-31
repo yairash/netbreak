@@ -17,7 +17,7 @@ router.get('/', async function (req, res, next) {
 });
 
 async function savePage(url) {
-    const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+    const browser = await puppeteer.launch({ headless: 'new', executablePath: "/home/yair/Documents/Computer_Science/Year_3/Final_project/netbreak/azure-server/netbreak/chrome-linux64/chrome", args: ['--no-sandbox'] });
     const page = await browser.newPage();
     // await page.goto(url, { waitUntil: 'networkidle0' });
     await page.goto(url, { waitUntil: 'domcontentloaded' });

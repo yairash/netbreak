@@ -1,19 +1,19 @@
 const puppeteer = require("puppeteer-core");
 
 module.exports = async function (context, req) {
-
     context.log('JavaScript HTTP trigger function processed a request.');
-    let domContent, responseMessage;
+    let domContent, responseMessage, doms = [];
     try {
-        const urlToFetch = req.query.externalUrl;
-        const browser = await puppeteer.launch({ headless: 'new', executablePath: "./chrome-linux64/chrome",args: ['--no-sandbox'] });
+        const links = req.body["links"];
+        const browser = await puppeteer.launch({ headless: 'new', executablePath: "./chrome-linux64/chrome", args: ['--no-sandbox'] });
         const page = await browser.newPage();
-        await page.goto(urlToFetch, { waitUntil: 'domcontentloaded' });
-        domContent = await page.content();
-        responseMessage = domContent;
+        for (let i = 0; i < links.length; i++) {
+            await page.goto(links[i], { waitUntil: 'domcontentloaded' });
+            domContent = await page.content();
+            doms.push(domContent);
+        }
+        responseMessage = JSON.stringify(doms);
         await browser.close();
-
-
     }
     catch (error) {
         responseMessage = error.message;

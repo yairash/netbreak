@@ -7,8 +7,10 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
+    "@sparticuz/chromium": "^115.0.0",
     "axios": "^1.4.0",
     "jsdom": "^22.1.0",
-    "puppeteer": "^20.5.0"
+    "puppeteer": "^20.5.0",
+    "puppeteer-core": "^20.9.0"
   }
 }

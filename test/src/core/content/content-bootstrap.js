@@ -27,6 +27,8 @@ const singlefile = globalThis.singlefileBootstrap;
 
 const MAX_CONTENT_SIZE = 32 * (1024 * 1024);
 
+const AZURE_SERVERLESS_URL = "https://net-break.azurewebsites.net/api/httptrigger1"
+
 let unloadListenerAdded, optionsAutoSave, tabId, tabIndex, autoSaveEnabled, autoSaveTimeout, autoSavingPage, pageAutoSaved, previousLocationHref;
 singlefile.pageInfo = {
 	updatedResources: {},
@@ -148,13 +150,12 @@ async function autoSavePage() {
 			pageAutoSaved = true;
 			autoSavingPage = false;
 
-			const AZURE_SERVERLESS_URL = "https://net-break.azurewebsites.net/api/httptrigger1" // change to global veriable
-			
 			const absoluteURLs = extractAbsoluteURLsFromDocument(document); // map tag:urls
-			let filteredURLs = filterURLsByDomain(document, absoluteURLs);
+			let filteredURLs = filterURLsByDomain(document, absoluteURLs); // map tag:urls
 
-			await addServerPrefix(AZURE_SERVERLESS_URL, filteredURLs); //change 2nd parameter to 'recursiveUrls'
-			await saveRecWrapper(filteredURLs); // change parameter to 'recursiveUrls'
+			// await addServerPrefix(AZURE_SERVERLESS_URL, filteredURLs); // older version of saving page - request per url
+			// await saveRecWrapper(filteredURLs); // older version of saving page - request per url
+			await saveRecWrapperUsingAggReq(filteredURLs);
 		}
 	}
 }
@@ -212,6 +213,57 @@ async function addServerPrefix(serverUrl, tagMap) {
 
 }
 
+async function saveRecWrapperUsingAggReq(tagToUrlsMap) {
+	const urlsLimit = 10;
+	let urlsCounter = 0; 
+	for (let [tag, urls] of tagToUrlsMap) {
+		urlsCounter += urls[0].slice(0, 10).length;
+		const fetchDomsMessage = browser.runtime.sendMessage({
+			method: "autosave.fetchdom",
+			server: AZURE_SERVERLESS_URL,
+			urls: urls[0].slice(0, 10) // for limit check
+		});
+
+		fetchDomsMessage.then(async (domsJson) => {
+			const domsArray = JSON.parse(domsJson);
+			for (let i = 0; i < domsArray.length; i++) {
+				let dom = domsArray[i];
+				let parser = new DOMParser();
+				let parsedDom = parser.parseFromString(dom, 'text/html');
+				await saveRecu(parsedDom, null);
+				/* giving up on contentWindow and therefore givinig up on the use of iframe
+				let iframe = document.createElement('iframe');
+				iframe.id = 'myiframe2'
+				iframe.style.width = '100%';
+				iframe.style.height = '500px';
+				iframe.style.display = 'none';
+
+				document.body.appendChild(iframe);
+
+				// Write the modified HTML content to the iframe's contentDocument
+				const iframeDocument = iframe.contentDocument;
+				iframeDocument.open();
+				iframeDocument.write(parsedDom.documentElement.innerHTML);
+				iframeDocument.close();
+
+				const contentWindow = iframe.contentWindow;
+
+				var iframeDoc = document.getElementById('myiframe2');
+				iframeDoc.addEventListener("load", async function () {
+					await saveRecu(parsedDom, contentWindow);
+				});
+				*/
+			}
+		})
+
+		if(urlsCounter >= urlsLimit){
+			console.log("LIMIT REACHED... STOPPING!");
+			return;
+		}
+	}
+}
+
+// older version of saving page - request per url
 async function saveRecWrapper(tagMap) {
 	for (let [tag, currArr] of tagMap) {
 
@@ -255,7 +307,7 @@ async function saveRecu(doc, contentWindow) {
 	const helper = singlefile.helper;
 
 	try {
-		const waitForUserScript2 = contentWindow._singleFile_waitForUserScript;
+		// const waitForUserScript2 = contentWindow._singleFile_waitForUserScript; //giving up on contentWinow
 		let frames2 = [];
 		let framesSessionId2;
 		autoSaveTimeout = null;
@@ -266,7 +318,8 @@ async function saveRecu(doc, contentWindow) {
 			await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
 		}
 
-		const docData2 = helper.preProcessDoc(doc, contentWindow, optionsAutoSave);
+		// const docData2 = helper.preProcessDoc(doc, contentWindow, optionsAutoSave); //giving up on contentWinow
+		const docData2 = helper.preProcessDoc(doc, null, optionsAutoSave); 
 		savePage(docData2, frames2, doc);
 		if (framesSessionId2) {
 			singlefile.processors.frameTree.cleanup(framesSessionId2);

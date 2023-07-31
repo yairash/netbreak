@@ -70,16 +70,40 @@ async function onMessage(message, sender, sendResponse) {
 		return true;
 	}
 	else if (message.method.endsWith(".fetchdom")) {
-		const dom = await fetchDomFromUrl(message.url);
-		return dom;
+		// const dom = await fetchDomFromUrl(message.url);
+		// return dom;
+		const doms = await fetchDomsUsingPostReq(message.server, message.urls);
+		return doms;
 	}
 	return true;
+}
+
+function fetchDomsUsingPostReq(server, urls) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+
+		xhr.open('POST', server);
+		xhr.onload = function () {
+			if (xhr.status === 200) {
+				resolve(xhr.response);
+			} else {
+				reject(new Error(`Request failed with status ${xhr.status}`));
+			}
+		};
+
+		xhr.onerror = function () {
+			reject(new Error('Request failed'));
+		};
+		const bodyReqContent = {"links": urls}
+		xhr.send(JSON.stringify(bodyReqContent));
+	});
+
 }
 
 function fetchDomFromUrl(externalUrl) {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
-		
+
 		xhr.open('GET', externalUrl);
 		xhr.onload = function () {
 			if (xhr.status === 200) {
