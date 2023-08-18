@@ -125,6 +125,8 @@ const autoSaveRemoveLabel = document.getElementById("autoSaveRemoveLabel");
 const autoSaveRepeatLabel = document.getElementById("autoSaveRepeatLabel");
 const autoSaveRepeatDelayLabel = document.getElementById("autoSaveRepeatDelayLabel");
 const autoSaveExternalSaveLabel = document.getElementById("autoSaveExternalSaveLabel");
+const autoSaveNumOfLinksManuallyCheckboxLabel = document.getElementById("autoSaveNumOfLinksManuallyCheckboxLabel");
+const autoSaveNumOfLinksManuallyLabel = document.getElementById("autoSaveNumOfLinksManuallyLabel");
 const removeAlternativeFontsLabel = document.getElementById("removeAlternativeFontsLabel");
 const removeAlternativeImagesLabel = document.getElementById("removeAlternativeImagesLabel");
 const removeAlternativeMediasLabel = document.getElementById("removeAlternativeMediasLabel");
@@ -619,6 +621,8 @@ autoSaveLoadOrUnloadLabel.textContent = browser.i18n.getMessage("optionAutoSaveL
 autoSaveDiscardLabel.textContent = browser.i18n.getMessage("optionAutoSaveDiscard");
 autoSaveRemoveLabel.textContent = browser.i18n.getMessage("optionAutoSaveRemove");
 autoSaveRepeatLabel.textContent = browser.i18n.getMessage("optionAutoSaveRepeat");
+autoSaveNumOfLinksManuallyCheckboxLabel.textContent = browser.i18n.getMessage("optionAutoSaveNumOfLinksManuallyCheckbox");
+autoSaveNumOfLinksManuallyLabel.textContent = browser.i18n.getMessage("optionAutoSaveNumOfLinksManually");
 autoSaveRepeatDelayLabel.textContent = browser.i18n.getMessage("optionAutoSaveRepeatDelay");
 autoSaveExternalSaveLabel.textContent = browser.i18n.getMessage("optionAutoSaveExternalSave");
 removeAlternativeFontsLabel.textContent = browser.i18n.getMessage("optionRemoveAlternativeFonts");
@@ -906,6 +910,10 @@ async function refresh(profileName) {
 	autoSaveRepeatDelayInput.disabled = !profileOptions.autoSaveRepeat;
 	autoSaveExternalSaveInput.checked = profileOptions.autoSaveExternalSave;
 	autoSaveExternalSaveInput.parentElement.hidden = !companionState.enabled;
+	autoSaveNumOfLinksManuallyCheckbox.checked = profileOptions.autoSaveNumOfLinksManuallyCheckbox;
+	autoSaveNumOfLinksManually.disabled = !profileOptions.autoSaveNumOfLinksManuallyCheckbox;
+	const initialNumberOfLinks = Math.max(profileOptions.autoSaveNumberOfLinksManually || 10, 1);
+	autoSaveNumOfLinksManually.value = initialNumberOfLinks;
 	removeAlternativeFontsInput.checked = profileOptions.removeAlternativeFonts;
 	removeAlternativeImagesInput.checked = profileOptions.removeAlternativeImages;
 	groupDuplicateImagesInput.checked = profileOptions.groupDuplicateImages;
@@ -1007,6 +1015,8 @@ async function update() {
 			autoSaveUnload: autoSaveUnloadInput.checked,
 			autoSaveDiscard: autoSaveDiscardInput.checked,
 			autoSaveRemove: autoSaveRemoveInput.checked,
+			autoSaveNumOfLinksManuallyCheckbox: autoSaveNumOfLinksManuallyCheckbox.checked,
+			autoSaveNumberOfLinksManually: autoSaveNumOfLinksManuallyCheckbox.checked ? Math.max(autoSaveNumOfLinksManually.value, 1) : 10,
 			autoSaveLoadOrUnload: autoSaveLoadOrUnloadInput.checked,
 			autoSaveRepeat: autoSaveRepeatInput.checked,
 			autoSaveRepeatDelay: Math.max(autoSaveRepeatDelayInput.value, 1),

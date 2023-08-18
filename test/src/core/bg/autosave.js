@@ -47,6 +47,7 @@ export {
 };
 
 async function onMessage(message, sender, sendResponse) {
+	let downloadId;
 	if (message.method.endsWith(".save")) {
 		if (message.autoSaveDiscard || message.autoSaveRemove) {
 			if (sender.tab) {
@@ -57,28 +58,27 @@ async function onMessage(message, sender, sendResponse) {
 					(pendingMessages[message.tabId].discarded && message.autoSaveDiscard))
 			) {
 				delete pendingMessages[message.tabId];
-				await saveContent(message, { id: message.tabId, index: message.tabIndex, url: sender.url });
+				downloadId = await saveContent(message, { id: message.tabId, index: message.tabIndex, url: sender.url });
 			}
 			if (message.autoSaveUnload) {
 				delete pendingMessages[message.tabId];
-				await saveContent(message, sender.tab);
+				downloadId = await saveContent(message, sender.tab);
 			}
 		} else {
 			delete pendingMessages[message.tabId];
-			await saveContent(message, sender.tab);
+			downloadId = await saveContent(message, sender.tab);
 		}
-		return true;
+		const fileName = await browser.downloads.search({ id: downloadId }).then(fileNameById, fileNameByIdOnError);
+		return fileName; //returns the name of the downloaded file
 	}
 	else if (message.method.endsWith(".fetchdom")) {
-		// const dom = await fetchDomFromUrl(message.url);
-		// return dom;
-		const doms = await fetchDomsUsingPostReq(message.server, message.urls);
+		const doms = await fetchDomsUsingAggReq(message.server, message.urls);
 		return doms;
 	}
 	return true;
 }
 
-function fetchDomsUsingPostReq(server, urls) {
+function fetchDomsUsingAggReq(server, urls) {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 
@@ -94,7 +94,7 @@ function fetchDomsUsingPostReq(server, urls) {
 		xhr.onerror = function () {
 			reject(new Error('Request failed'));
 		};
-		const bodyReqContent = {"links": urls}
+		const bodyReqContent = { "links": urls }
 		xhr.send(JSON.stringify(bodyReqContent));
 	});
 
@@ -200,6 +200,7 @@ async function saveContent(message, tab) {
 		options.tabIndex = tab.index;
 		options.keepFilename = options.saveToGDrive || options.saveToGitHub || options.saveWithWebDAV;
 		let pageData;
+		let downloadId;
 		try {
 			if (options.autoSaveExternalSave) {
 				await companion.externalSave(options);
@@ -226,7 +227,7 @@ async function saveContent(message, tab) {
 				} else {
 					const blob = new Blob([pageData.content], { type: "text/html" });
 					pageData.url = URL.createObjectURL(blob);
-					await downloads.downloadPage(pageData, options);
+					downloadId = await downloads.downloadPage(pageData, options);
 					if (options.openSavedPage) {
 						const createTabProperties = { active: true, url: URL.createObjectURL(blob), windowId: tab.windowId };
 						const index = tab.index;
@@ -254,6 +255,7 @@ async function saveContent(message, tab) {
 				URL.revokeObjectURL(pageData.url);
 			}
 			ui.onEnd(tabId, true);
+			return downloadId;
 		}
 	}
 }
@@ -283,4 +285,13 @@ function fetch(url, options = {}) {
 		}
 		xhrRequest.send();
 	});
+}
+function fileNameById(downloads) {
+	for (const download of downloads) {
+		return download.filename;
+	}
+}
+
+function fileNameByIdOnError(error) {
+	return "";
 }

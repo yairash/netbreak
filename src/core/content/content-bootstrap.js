@@ -138,8 +138,15 @@ async function autoSavePage() {
 				await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
 			}
 
+			//TODO - Try to move childs download (below 5 lines) to init method for saving time.
+			const absoluteURLs = extractAbsoluteURLsFromDocument(document); // map tag:urls
+			let filteredURLs = filterURLsByDomain(document, absoluteURLs); // map tag:urls
+			let urlToFileNameMap = new Map();
+			urlToFileNameMap = await saveRecWrapperUsingAggReq(filteredURLs); //recursive save
+			//TODO - Handle errors
+			await updateRootDom(document, urlToFileNameMap);
 			const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
-			savePage(docData, frames);
+			const rootDownloadedFileName = await savePage(docData, frames); //saving root page + extracting it's file name
 			if (framesSessionId) {
 				singlefile.processors.frameTree.cleanup(framesSessionId);
 			}
@@ -149,13 +156,28 @@ async function autoSavePage() {
 			}
 			pageAutoSaved = true;
 			autoSavingPage = false;
+		}
+	}
+}
 
-			const absoluteURLs = extractAbsoluteURLsFromDocument(document); // map tag:urls
-			let filteredURLs = filterURLsByDomain(document, absoluteURLs); // map tag:urls
+async function updateRootDom(document, urlToFileNameMap) {
+	let currentTargetURL = null;
+	for (let [url, fileName] of urlToFileNameMap) {
+		if(currentTargetURL === null){
+			currentTargetURL = new URL(url);
+		}
+		else{
+			currentTargetURL.href = url;
+		}
+		const anchorElements = document.getElementsByTagName('a');
+		const newHref = `file://${fileName}`;
 
-			// await addServerPrefix(AZURE_SERVERLESS_URL, filteredURLs); // older version of saving page - request per url
-			// await saveRecWrapper(filteredURLs); // older version of saving page - request per url
-			await saveRecWrapperUsingAggReq(filteredURLs);
+		for (const anchorElement of anchorElements) {
+			if (anchorElement.getAttribute('href') === currentTargetURL.href || anchorElement.getAttribute('href') === currentTargetURL.pathname ) {
+				anchorElement.setAttribute('href', newHref);
+				anchorElement.style.color = "green";
+				break;
+			}
 		}
 	}
 }
@@ -201,66 +223,57 @@ function filterURLsByDomain(document, urlsMap) {
 	return filteredURLs;
 }
 
-async function addServerPrefix(serverUrl, tagMap) {
-	for (let [tag, currArr] of tagMap) {
-
-		for (let i = 0; i < currArr[0].length && i < 10; i++) {
-			currArr[0][i] = serverUrl + '?externalUrl=' + currArr[0][i];
-		}
-
-		tagMap.set(tag, currArr);
-	}
-
-}
-
 async function saveRecWrapperUsingAggReq(tagToUrlsMap) {
 	const urlsLimit = 10;
-	let urlsCounter = 0; 
+	let urlsCounter = 0, fileName, urlsToDownload = [];
+	const urlToFileNameMap = new Map();
 	for (let [tag, urls] of tagToUrlsMap) {
-		urlsCounter += urls[0].slice(0, 10).length;
-		const fetchDomsMessage = browser.runtime.sendMessage({
-			method: "autosave.fetchdom",
-			server: AZURE_SERVERLESS_URL,
-			urls: urls[0].slice(0, 10) // for limit check
-		});
-
-		fetchDomsMessage.then(async (domsJson) => {
-			const domsArray = JSON.parse(domsJson);
-			for (let i = 0; i < domsArray.length; i++) {
-				let dom = domsArray[i];
-				let parser = new DOMParser();
-				let parsedDom = parser.parseFromString(dom, 'text/html');
-				await saveRecu(parsedDom, null);
-				/* giving up on contentWindow and therefore givinig up on the use of iframe
-				let iframe = document.createElement('iframe');
-				iframe.id = 'myiframe2'
-				iframe.style.width = '100%';
-				iframe.style.height = '500px';
-				iframe.style.display = 'none';
-
-				document.body.appendChild(iframe);
-
-				// Write the modified HTML content to the iframe's contentDocument
-				const iframeDocument = iframe.contentDocument;
-				iframeDocument.open();
-				iframeDocument.write(parsedDom.documentElement.innerHTML);
-				iframeDocument.close();
-
-				const contentWindow = iframe.contentWindow;
-
-				var iframeDoc = document.getElementById('myiframe2');
-				iframeDoc.addEventListener("load", async function () {
-					await saveRecu(parsedDom, contentWindow);
-				});
-				*/
-			}
-		})
-
-		if(urlsCounter >= urlsLimit){
-			console.log("LIMIT REACHED... STOPPING!");
-			return;
+		if(tag !== "p" && tag !== "P") {continue}; //TEST
+		urlsToDownload = urlsToDownload.concat(urls[0].slice(0, urlsLimit - urlsCounter)); // (urlsLimit - urlsCounter) for limit check
+		urlsCounter += urlsToDownload.length;
+		if (urlsCounter >= urlsLimit) {
+			// limit reached
+			break;
 		}
 	}
+
+	const domsJson = await browser.runtime.sendMessage({
+		method: "autosave.fetchdom",
+		server: AZURE_SERVERLESS_URL,
+		urls: urlsToDownload
+	});
+	const domsArray = JSON.parse(domsJson);
+	for (let i = 0; i < domsArray.length; i++) {
+		let dom = domsArray[i];
+		let parser = new DOMParser();
+		let parsedDom = parser.parseFromString(dom, 'text/html');
+		fileName = await saveRecu(parsedDom, null);
+		urlToFileNameMap.set(urlsToDownload[i], fileName);
+		/* giving up on contentWindow and therefore givinig up on the use of iframe
+		let iframe = document.createElement('iframe');
+		iframe.id = 'myiframe2'
+		iframe.style.width = '100%';
+		iframe.style.height = '500px';
+		iframe.style.display = 'none';
+
+		document.body.appendChild(iframe);
+
+		// Write the modified HTML content to the iframe's contentDocument
+		const iframeDocument = iframe.contentDocument;
+		iframeDocument.open();
+		iframeDocument.write(parsedDom.documentElement.innerHTML);
+		iframeDocument.close();
+
+		const contentWindow = iframe.contentWindow;
+
+		var iframeDoc = document.getElementById('myiframe2');
+		iframeDoc.addEventListener("load", async function () {
+			await saveRecu(parsedDom, contentWindow);
+		});
+		*/
+	}
+
+	return urlToFileNameMap;
 }
 
 // older version of saving page - request per url
@@ -305,7 +318,7 @@ async function saveRecWrapper(tagMap) {
 
 async function saveRecu(doc, contentWindow) {
 	const helper = singlefile.helper;
-
+	let fileName;
 	try {
 		// const waitForUserScript2 = contentWindow._singleFile_waitForUserScript; //giving up on contentWinow
 		let frames2 = [];
@@ -319,8 +332,8 @@ async function saveRecu(doc, contentWindow) {
 		}
 
 		// const docData2 = helper.preProcessDoc(doc, contentWindow, optionsAutoSave); //giving up on contentWinow
-		const docData2 = helper.preProcessDoc(doc, null, optionsAutoSave); 
-		savePage(docData2, frames2, doc);
+		const docData2 = helper.preProcessDoc(doc, null, optionsAutoSave);
+		fileName = savePage(docData2, frames2, doc);
 		if (framesSessionId2) {
 			singlefile.processors.frameTree.cleanup(framesSessionId2);
 		}
@@ -335,6 +348,8 @@ async function saveRecu(doc, contentWindow) {
 		console.log("Failed!");
 		console.log(e);
 	}
+
+	return fileName;
 }
 
 
@@ -379,7 +394,7 @@ function autoSaveUnloadedPage({ autoSaveUnload, autoSaveDiscard, autoSaveRemove 
 }
 
 // added argument called testDoc which by default is document
-function savePage(docData, frames, window = document, { autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
+async function savePage(docData, frames, window = document, { autoSaveUnload, autoSaveDiscard, autoSaveRemove } = {}) {
 	const helper = singlefile.helper;
 	const updatedResources = singlefile.pageInfo.updatedResources;
 	const visitDate = singlefile.pageInfo.visitDate.getTime();
@@ -407,6 +422,13 @@ function savePage(docData, frames, window = document, { autoSaveUnload, autoSave
 		autoSaveDiscard,
 		autoSaveRemove
 	});
+
+	const downloadedFileName = await sending.then((downloadedFileName) => {
+		return downloadedFileName;
+	}).catch(() => {
+		return "";
+	});
+	return downloadedFileName;
 }
 
 async function openEditor(document) {

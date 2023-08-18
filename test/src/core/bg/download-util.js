@@ -23,6 +23,10 @@
 
 /* global browser */
 
+import * as fs from 'fs';
+import * as jsdom from 'jsdom';
+import { JSDOM } from 'jsdom';
+
 const STATE_DOWNLOAD_COMPLETE = "complete";
 const STATE_DOWNLOAD_INTERRUPTED = "interrupted";
 const STATE_ERROR_CANCELED_CHROMIUM = "USER_CANCELED";
@@ -79,7 +83,7 @@ async function download(downloadInfo, replacementCharacter) {
 			if (event.id == downloadId && event.state) {
 				if (event.state.current == STATE_DOWNLOAD_COMPLETE) {
 					browser.downloads.search({ id: downloadId })
-						.then(downloadItems => resolve({ filename: downloadItems[0] && downloadItems[0].filename }))
+						.then(downloadItems => resolve({ filename: downloadItems[0] && downloadItems[0].filename, id: downloadId }))
 						.catch(() => resolve({}));
 					browser.downloads.onChanged.removeListener(onChanged);
 				}

@@ -455,6 +455,14 @@
 		"message": "save the page with NetBreak Companion",
 		"description": "Options page label: 'save the page with NetBreak Companion'"
 	},
+	"optionAutoSaveNumOfLinksManuallyCheckbox": {
+		"message": "Choose manually the number of links to save for each page",
+		"description": "Options page label: 'Choose manually the number of links to save for each page'"
+	},
+	"optionAutoSaveNumOfLinksManually": {
+		"message": "The number of links:",
+		"description": "Options page label: 'The number of links:'"
+	},
 	"optionsEditorSubTitle": {
 		"message": "Annotation editor",
 		"description": "Options sub-title: 'Annotation editor'"

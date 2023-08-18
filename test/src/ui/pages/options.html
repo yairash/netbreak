@@ -17,7 +17,8 @@
 				<span id="expandAllButton"></span>
 				<span id="titleLabel"></span>
 				<a href="options.html#" target="_blank" class="new-window-link">
-					<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==">
+					<img
+						src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==">
 				</a>
 			</span>
 			<span class="profiles">
@@ -161,7 +162,7 @@
 			</div>
 			<div class="option second-level">
 				<label for="loadDeferredImagesDispatchScrollEventInput"
-					   id="loadDeferredImagesDispatchScrollEventLabel"></label>
+					id="loadDeferredImagesDispatchScrollEventLabel"></label>
 				<input type="checkbox" id="loadDeferredImagesDispatchScrollEventInput">
 			</div>
 			<div class="option second-level">
@@ -410,6 +411,18 @@
 				<label for="autoSaveExternalSaveInput" id="autoSaveExternalSaveLabel"></label>
 				<input type="checkbox" id="autoSaveExternalSaveInput">
 			</div>
+			<div class="option">
+				<label for="autoSaveNumOfLinksManuallyCheckbox" id="autoSaveNumOfLinksManuallyCheckboxLabel">
+					{{optionAutoSaveNumOfLinksManuallyCheckbox}}
+				</label>
+				<input type="checkbox" id="autoSaveNumOfLinksManuallyCheckbox">
+			</div>
+			<div class="option second-level">
+				<label for="autoSaveNumOfLinksManually" id="autoSaveNumOfLinksManuallyLabel">
+					{{optionAutoSaveNumOfLinksManually}}
+				</label>
+				<input type="number" id="autoSaveNumOfLinksManually" value="10" min="1">
+			</div>
 		</details>
 		<details>
 			<summary id="miscLabel"></summary>
@@ -463,7 +476,7 @@
 					<form class="tr rule-create">
 						<span class="td rule-url">
 							<input type="text" id="ruleUrlInput"
-								   placeholder="Type a complete or partial URL (e.g. example.com)">
+								placeholder="Type a complete or partial URL (e.g. example.com)">
 						</span>
 						<span class="td rule-profile"><select id="ruleProfileInput"></select></span>
 						<span class="td rule-autosave-profile"><select id="ruleAutoSaveProfileInput"></select></span>
@@ -548,71 +561,71 @@
 	<script src="/lib/chrome-browser-polyfill.js"></script>
 	<script type="module" src="../bg/ui-options.js"></script>
 	<style>
-        #editorLabel,
-        #defaultEditorModeLabel,
-        #defaultEditorModeInput,
-        #applySystemThemeLabel,
-        #applySystemThemeInput,
-        #warnUnsavedPageLabel,
-        #warnUnsavedPageInput,
-        #openEditorLabel,
-        #openEditorInput,
-        #autoOpenEditorLabel,
-        #autoOpenEditorInput,
-        #miscLabel,
-        #addProofOption,
-        #woleetKeyOption,
-        #backgroundSaveOptions,
-        #displayStatsOption,
-        #destinationLabel,
-        #saveToFilesystemLabel,
-        #saveToFilesystemInput,
-        #saveToClipboardLabel,
-        #saveToClipboardInput,
-        #saveToGitHubLabel,
-        #saveToGitHubInput,
-        #githubTokenLabel,
-        #githubTokenInput,
-        #githubUserLabel,
-        #githubUserInput,
-        #githubRepositoryLabel,
-        #githubRepositoryInput,
-        #githubBranchLabel,
-        #githubBranchInput,
-        #saveWithWebDAVLabel,
-        #saveWithWebDAVInput,
-        #webDAVURLLabel,
-        #webDAVURLInput,
-        #webDAVUserLabel,
-        #webDAVUserInput,
-        #webDAVPasswordLabel,
-        #webDAVPasswordInput,
-        #saveToGDriveLabel,
-        #saveToGDriveInput,
-        #saveWithCompanionLabel,
-        #saveWithCompanionInput,
-        #filenameLabel,
-        #filenameTemplateLabel,
-        #filenameTemplateInput,
-        #filenameMaxLengthLabel,
-        #filenameMaxLengthInput,
-        #filenameMaxLengthUnitInput,
-        #confirmFilenameLabel,
-        #confirmFilenameInput,
-        #filenameConflictActionLabel,
-        #filenameConflictActionInput,
-        #bookmarksOptions,
-        #bookmarksLabel,
-        #saveCreatedBookmarksLabel,
-        #saveCreatedBookmarksInput,
-        #replaceBookmarkURLLabel,
-        #replaceBookmarkURLInput,
-        #ignoredBookmarkFoldersLabel,
-        #ignoredBookmarkFoldersInput,
-        #allowedBookmarkFoldersLabel,
-        #allowedBookmarkFoldersInput {
-            display: none;
-        }
+		#editorLabel,
+		#defaultEditorModeLabel,
+		#defaultEditorModeInput,
+		#applySystemThemeLabel,
+		#applySystemThemeInput,
+		#warnUnsavedPageLabel,
+		#warnUnsavedPageInput,
+		#openEditorLabel,
+		#openEditorInput,
+		#autoOpenEditorLabel,
+		#autoOpenEditorInput,
+		#miscLabel,
+		#addProofOption,
+		#woleetKeyOption,
+		#backgroundSaveOptions,
+		#displayStatsOption,
+		#destinationLabel,
+		#saveToFilesystemLabel,
+		#saveToFilesystemInput,
+		#saveToClipboardLabel,
+		#saveToClipboardInput,
+		#saveToGitHubLabel,
+		#saveToGitHubInput,
+		#githubTokenLabel,
+		#githubTokenInput,
+		#githubUserLabel,
+		#githubUserInput,
+		#githubRepositoryLabel,
+		#githubRepositoryInput,
+		#githubBranchLabel,
+		#githubBranchInput,
+		#saveWithWebDAVLabel,
+		#saveWithWebDAVInput,
+		#webDAVURLLabel,
+		#webDAVURLInput,
+		#webDAVUserLabel,
+		#webDAVUserInput,
+		#webDAVPasswordLabel,
+		#webDAVPasswordInput,
+		#saveToGDriveLabel,
+		#saveToGDriveInput,
+		#saveWithCompanionLabel,
+		#saveWithCompanionInput,
+		#filenameLabel,
+		#filenameTemplateLabel,
+		#filenameTemplateInput,
+		#filenameMaxLengthLabel,
+		#filenameMaxLengthInput,
+		#filenameMaxLengthUnitInput,
+		#confirmFilenameLabel,
+		#confirmFilenameInput,
+		#filenameConflictActionLabel,
+		#filenameConflictActionInput,
+		#bookmarksOptions,
+		#bookmarksLabel,
+		#saveCreatedBookmarksLabel,
+		#saveCreatedBookmarksInput,
+		#replaceBookmarkURLLabel,
+		#replaceBookmarkURLInput,
+		#ignoredBookmarkFoldersLabel,
+		#ignoredBookmarkFoldersInput,
+		#allowedBookmarkFoldersLabel,
+		#allowedBookmarkFoldersInput {
+			display: none;
+		}
 
 		#autoSettingsLabel,
 		.rules-table-container,

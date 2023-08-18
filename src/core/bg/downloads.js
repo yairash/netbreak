@@ -318,7 +318,7 @@ async function downloadPage(pageData, options) {
 			url: pageData.url,
 			saveAs: options.confirmFilename,
 			filename: pageData.filename,
-			conflictAction: options.filenameConflictAction
+			conflictAction: options.filenameConflictAction,
 		};
 		if (options.incognito) {
 			downloadInfo.incognito = true;
@@ -333,6 +333,7 @@ async function downloadPage(pageData, options) {
 			}
 			await bookmarks.update(pageData.bookmarkId, { url: downloadData.filename });
 		}
+		return downloadData.id;
 	}
 }
 

@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"express": "^4.18.2",
+		"jsdom": "^22.1.0",
 		"puppeteer": "^20.5.0",
 		"single-file-cli": "1.0.34",
 		"single-file-core": "1.0.42"
