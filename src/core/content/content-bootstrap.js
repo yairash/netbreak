@@ -138,12 +138,10 @@ async function autoSavePage() {
 				await waitForUserScript(helper.ON_BEFORE_CAPTURE_EVENT_NAME);
 			}
 
-			//TODO - Try to move childs download (below 5 lines) to init method for saving time.
 			const absoluteURLs = extractAbsoluteURLsFromDocument(document); // map tag:urls
 			let filteredURLs = filterURLsByDomain(document, absoluteURLs); // map tag:urls
 			let urlToFileNameMap = new Map();
 			urlToFileNameMap = await saveRecWrapperUsingAggReq(filteredURLs); //recursive save
-			//TODO - Handle errors
 			await updateRootDom(document, urlToFileNameMap);
 			const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
 			const rootDownloadedFileName = await savePage(docData, frames); //saving root page + extracting it's file name
@@ -162,15 +160,20 @@ async function autoSavePage() {
 
 async function updateRootDom(document, urlToFileNameMap) {
 	let currentTargetURL = null;
+	const anchorElements = document.getElementsByTagName('a');
+	
 	for (let [url, fileName] of urlToFileNameMap) {
+		if(fileName === null){
+			continue; // if page was failed to download it's name field will be null.
+		}
+		const newHref = `file://${fileName}`;
+
 		if(currentTargetURL === null){
 			currentTargetURL = new URL(url);
 		}
 		else{
 			currentTargetURL.href = url;
 		}
-		const anchorElements = document.getElementsByTagName('a');
-		const newHref = `file://${fileName}`;
 
 		for (const anchorElement of anchorElements) {
 			if (anchorElement.getAttribute('href') === currentTargetURL.href || anchorElement.getAttribute('href') === currentTargetURL.pathname ) {
@@ -225,7 +228,7 @@ function filterURLsByDomain(document, urlsMap) {
 
 async function saveRecWrapperUsingAggReq(tagToUrlsMap) {
 	const urlsLimit = 10;
-	let urlsCounter = 0, fileName, urlsToDownload = [];
+	let urlsCounter = 0, downloadData, fileName, urlsToDownload = [];
 	const urlToFileNameMap = new Map();
 	for (let [tag, urls] of tagToUrlsMap) {
 		if(tag !== "p" && tag !== "P") {continue}; //TEST
@@ -247,30 +250,14 @@ async function saveRecWrapperUsingAggReq(tagToUrlsMap) {
 		let dom = domsArray[i];
 		let parser = new DOMParser();
 		let parsedDom = parser.parseFromString(dom, 'text/html');
-		fileName = await saveRecu(parsedDom, null);
+		downloadData = await saveRecu(parsedDom, null);
+		if(downloadData.downloadComplete === false){
+			fileName = null;
+		}
+		else{
+			fileName = downloadData.fileName;
+		}
 		urlToFileNameMap.set(urlsToDownload[i], fileName);
-		/* giving up on contentWindow and therefore givinig up on the use of iframe
-		let iframe = document.createElement('iframe');
-		iframe.id = 'myiframe2'
-		iframe.style.width = '100%';
-		iframe.style.height = '500px';
-		iframe.style.display = 'none';
-
-		document.body.appendChild(iframe);
-
-		// Write the modified HTML content to the iframe's contentDocument
-		const iframeDocument = iframe.contentDocument;
-		iframeDocument.open();
-		iframeDocument.write(parsedDom.documentElement.innerHTML);
-		iframeDocument.close();
-
-		const contentWindow = iframe.contentWindow;
-
-		var iframeDoc = document.getElementById('myiframe2');
-		iframeDoc.addEventListener("load", async function () {
-			await saveRecu(parsedDom, contentWindow);
-		});
-		*/
 	}
 
 	return urlToFileNameMap;
@@ -318,7 +305,7 @@ async function saveRecWrapper(tagMap) {
 
 async function saveRecu(doc, contentWindow) {
 	const helper = singlefile.helper;
-	let fileName;
+	let downloadData;
 	try {
 		// const waitForUserScript2 = contentWindow._singleFile_waitForUserScript; //giving up on contentWinow
 		let frames2 = [];
@@ -333,7 +320,7 @@ async function saveRecu(doc, contentWindow) {
 
 		// const docData2 = helper.preProcessDoc(doc, contentWindow, optionsAutoSave); //giving up on contentWinow
 		const docData2 = helper.preProcessDoc(doc, null, optionsAutoSave);
-		fileName = savePage(docData2, frames2, doc);
+		downloadData = savePage(docData2, frames2, doc);
 		if (framesSessionId2) {
 			singlefile.processors.frameTree.cleanup(framesSessionId2);
 		}
@@ -349,7 +336,7 @@ async function saveRecu(doc, contentWindow) {
 		console.log(e);
 	}
 
-	return fileName;
+	return downloadData;
 }
 
 
@@ -423,12 +410,12 @@ async function savePage(docData, frames, window = document, { autoSaveUnload, au
 		autoSaveRemove
 	});
 
-	const downloadedFileName = await sending.then((downloadedFileName) => {
-		return downloadedFileName;
+	const downloadData = await sending.then((downloadData) => {
+		return downloadData;
 	}).catch(() => {
-		return "";
+		return {downloadComplete: false, fileName: null};
 	});
-	return downloadedFileName;
+	return downloadData;
 }
 
 async function openEditor(document) {

@@ -333,7 +333,7 @@ async function downloadPage(pageData, options) {
 			}
 			await bookmarks.update(pageData.bookmarkId, { url: downloadData.filename });
 		}
-		return downloadData.id;
+		return {downloadId: downloadData.id, downloadComplete: downloadData.complete};
 	}
 }
 

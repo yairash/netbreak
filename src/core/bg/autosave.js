@@ -47,7 +47,7 @@ export {
 };
 
 async function onMessage(message, sender, sendResponse) {
-	let downloadId;
+	let downloadData, downloadId, downloadComplete;
 	if (message.method.endsWith(".save")) {
 		if (message.autoSaveDiscard || message.autoSaveRemove) {
 			if (sender.tab) {
@@ -58,18 +58,20 @@ async function onMessage(message, sender, sendResponse) {
 					(pendingMessages[message.tabId].discarded && message.autoSaveDiscard))
 			) {
 				delete pendingMessages[message.tabId];
-				downloadId = await saveContent(message, { id: message.tabId, index: message.tabIndex, url: sender.url });
+				downloadData = await saveContent(message, { id: message.tabId, index: message.tabIndex, url: sender.url });
 			}
 			if (message.autoSaveUnload) {
 				delete pendingMessages[message.tabId];
-				downloadId = await saveContent(message, sender.tab);
+				downloadData = await saveContent(message, sender.tab);
 			}
 		} else {
 			delete pendingMessages[message.tabId];
-			downloadId = await saveContent(message, sender.tab);
+			downloadData = await saveContent(message, sender.tab);
 		}
+		downloadId = downloadData.downloadId;
+		downloadComplete = downloadData.downloadComplete;
 		const fileName = await browser.downloads.search({ id: downloadId }).then(fileNameById, fileNameByIdOnError);
-		return fileName; //returns the name of the downloaded file
+		return {downloadComplete: downloadComplete, fileName: fileName}; //returns if download completed && the name of the downloaded file
 	}
 	else if (message.method.endsWith(".fetchdom")) {
 		const doms = await fetchDomsUsingAggReq(message.server, message.urls);
@@ -200,7 +202,7 @@ async function saveContent(message, tab) {
 		options.tabIndex = tab.index;
 		options.keepFilename = options.saveToGDrive || options.saveToGitHub || options.saveWithWebDAV;
 		let pageData;
-		let downloadId;
+		let downloadData, downloadId, downloadComplete;
 		try {
 			if (options.autoSaveExternalSave) {
 				await companion.externalSave(options);
@@ -227,7 +229,9 @@ async function saveContent(message, tab) {
 				} else {
 					const blob = new Blob([pageData.content], { type: "text/html" });
 					pageData.url = URL.createObjectURL(blob);
-					downloadId = await downloads.downloadPage(pageData, options);
+					downloadData = await downloads.downloadPage(pageData, options);
+					downloadId = downloadData.downloadId;
+					downloadComplete = downloadData.downloadComplete;
 					if (options.openSavedPage) {
 						const createTabProperties = { active: true, url: URL.createObjectURL(blob), windowId: tab.windowId };
 						const index = tab.index;
@@ -255,7 +259,7 @@ async function saveContent(message, tab) {
 				URL.revokeObjectURL(pageData.url);
 			}
 			ui.onEnd(tabId, true);
-			return downloadId;
+			return {downloadId: downloadId, downloadComplete: downloadComplete};
 		}
 	}
 }

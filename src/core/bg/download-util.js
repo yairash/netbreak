@@ -83,13 +83,17 @@ async function download(downloadInfo, replacementCharacter) {
 			if (event.id == downloadId && event.state) {
 				if (event.state.current == STATE_DOWNLOAD_COMPLETE) {
 					browser.downloads.search({ id: downloadId })
-						.then(downloadItems => resolve({ filename: downloadItems[0] && downloadItems[0].filename, id: downloadId }))
-						.catch(() => resolve({}));
+						.then(downloadItems => resolve({
+							filename: downloadItems[0] && downloadItems[0].filename,
+							id: downloadId,
+							complete: true
+						}))
+						.catch(() => resolve({complete: false}));
 					browser.downloads.onChanged.removeListener(onChanged);
 				}
 				if (event.state.current == STATE_DOWNLOAD_INTERRUPTED) {
 					if (event.error && event.error.current == STATE_ERROR_CANCELED_CHROMIUM) {
-						resolve({});
+						resolve({complete: false});
 					} else {
 						reject(new Error(event.state.current));
 					}
