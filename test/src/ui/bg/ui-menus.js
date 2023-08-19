@@ -102,7 +102,8 @@ export {
 	refreshTab as onTabActivated,
 	refreshTab as onInit,
 	createMenus as refreshTab,
-	init
+	init,
+	enableAutoSaveUsingKeyboard
 };
 
 function init(businessApi) {
@@ -620,4 +621,12 @@ async function updateCheckedValue(id, checked) {
 	checked = Boolean(checked);
 	menusCheckedState.set(id, checked);
 	await menus.update(id, { checked });
+}
+
+async function enableAutoSaveUsingKeyboard(tab) {
+	const allTabsData = await tabsData.get(tab.id);
+	allTabsData[tab.id].autoSave = true;
+	await updateCheckedValue(MENU_ID_AUTO_SAVE_TAB, allTabsData[tab.id].autoSave);
+	await tabsData.set(allTabsData);
+	refreshExternalComponents(tab);
 }

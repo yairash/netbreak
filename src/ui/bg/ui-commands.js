@@ -24,6 +24,7 @@
 /* global browser */
 
 import { queryTabs } from "./../../core/bg/tabs-util.js";
+import { enableAutoSaveUsingKeyboard } from './ui-menus.js';
 
 const commands = browser.commands;
 const BROWSER_COMMANDS_API_SUPPORTED = commands && commands.onCommand && commands.onCommand.addListener;
@@ -39,7 +40,7 @@ function init(businessApi) {
 }
 
 if (BROWSER_COMMANDS_API_SUPPORTED) {
-	commands.onCommand.addListener(async command => {
+	commands.onCommand.addListener(async (command, tab) => {
 		if (command == "save-selected-tabs") {
 			const highlightedTabs = await queryTabs({ currentWindow: true, highlighted: true });
 			business.saveTabs(highlightedTabs, { optionallySelected: true });
@@ -47,6 +48,9 @@ if (BROWSER_COMMANDS_API_SUPPORTED) {
 		if (command == "save-all-tabs") {
 			const tabs = await queryTabs({ currentWindow: true });
 			business.saveTabs(tabs);
+		}
+		if (command == "enable-autosave") {
+			await enableAutoSaveUsingKeyboard(tab);
 		}
 	});
 }

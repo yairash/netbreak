@@ -11,6 +11,10 @@
 		"message": "Save all tabs",
 		"description": "Command (Ctrl+Shift+U): 'Save all tabs'"
 	},
+	"commandEnableAutosave": {
+		"message": "Enable autosave",
+		"description": "Command (Ctrl+Shift+K): 'Enable Autosave'"
+	},
 	"menuSavePage": {
 		"message": "Save current page with NetBreak",
 		"description": "Menu entry: 'Save current page with NetBreak'"

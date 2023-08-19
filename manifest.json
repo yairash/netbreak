@@ -75,6 +75,12 @@
 				"default": "Ctrl+Shift+U"
 			},
 			"description": "__MSG_commandSaveAllTabs__"
+		},
+		"enable-autosave": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+K"
+			},
+			"description": "__MSG_commandEnableAutosave__"
 		}
 	},
 	"web_accessible_resources": [
