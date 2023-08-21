@@ -22,6 +22,7 @@
  */
 
 /* global browser, globalThis, window, document, location, setTimeout, Node */
+import { getAutoSaveNumberOfLinkToDownload } from "../bg/config.js";
 
 const singlefile = globalThis.singlefileBootstrap;
 
@@ -227,7 +228,7 @@ function filterURLsByDomain(document, urlsMap) {
 }
 
 async function saveRecWrapperUsingAggReq(tagToUrlsMap) {
-	const urlsLimit = 10;
+	const urlsLimit = await getAutoSaveNumberOfLinkToDownload();
 	let urlsCounter = 0, downloadData, fileName, urlsToDownload = [];
 	const urlToFileNameMap = new Map();
 	for (let [tag, urls] of tagToUrlsMap) {

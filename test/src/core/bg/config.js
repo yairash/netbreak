@@ -147,7 +147,8 @@ const DEFAULT_CONFIG = {
 	blockFonts: false,
 	blockScripts: true,
 	blockVideos: true,
-	blockAudios: true
+	blockAudios: true,
+	autoSaveNumberOfLinksManually: 10
 };
 
 const DEFAULT_RULES = [{
@@ -183,7 +184,8 @@ export {
 	addRule,
 	getAuthInfo,
 	setAuthInfo,
-	removeAuthInfo
+	removeAuthInfo,
+	getAutoSaveNumberOfLinkToDownload
 };
 
 async function upgrade() {
@@ -552,4 +554,9 @@ async function importConfig(config) {
 	await configStorage.remove(["profiles", "rules", "maxParallelWorkers"]);
 	await configStorage.set({ profiles: config.profiles, rules: config.rules, maxParallelWorkers: config.maxParallelWorkers });
 	await upgrade();
+}
+
+async function getAutoSaveNumberOfLinkToDownload() {
+	const config = await getConfig();
+	return config.profiles[DEFAULT_PROFILE_NAME].autoSaveNumberOfLinksManually;
 }
