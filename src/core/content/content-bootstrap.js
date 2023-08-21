@@ -119,6 +119,7 @@ async function initAutoSavePage(message) {
 
 async function autoSavePage() {
 	const helper = singlefile.helper;
+	let rootDownloadData;
 	if ((!autoSavingPage || autoSaveTimeout) && !pageAutoSaved) {
 		autoSavingPage = true;
 		if (optionsAutoSave.autoSaveDelay && !autoSaveTimeout) {
@@ -145,7 +146,7 @@ async function autoSavePage() {
 			urlToFileNameMap = await saveRecWrapperUsingAggReq(filteredURLs); //recursive save
 			await updateRootDom(document, urlToFileNameMap);
 			const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
-			const rootDownloadedFileName = await savePage(docData, frames); //saving root page + extracting it's file name
+			rootDownloadData = await savePage(docData, frames); //saving root page + extracting it's file name
 			if (framesSessionId) {
 				singlefile.processors.frameTree.cleanup(framesSessionId);
 			}
@@ -155,29 +156,42 @@ async function autoSavePage() {
 			}
 			pageAutoSaved = true;
 			autoSavingPage = false;
+			const rootFileName = rootDownloadData.fileName;
+			setRootPageInLocalStorage(rootFileName);
 		}
+
 	}
+}
+
+async function setRootPageInLocalStorage(rootFileName) {
+	const currentURL = document.URL;
+	browser.runtime.sendMessage({
+		method: "offline.setOnRuntime",
+		url: currentURL,
+		filePath: rootFileName
+
+	});
 }
 
 async function updateRootDom(document, urlToFileNameMap) {
 	let currentTargetURL = null;
 	const anchorElements = document.getElementsByTagName('a');
-	
+
 	for (let [url, fileName] of urlToFileNameMap) {
-		if(fileName === null){
+		if (fileName === null) {
 			continue; // if page was failed to download it's name field will be null.
 		}
 		const newHref = `file://${fileName}`;
 
-		if(currentTargetURL === null){
+		if (currentTargetURL === null) {
 			currentTargetURL = new URL(url);
 		}
-		else{
+		else {
 			currentTargetURL.href = url;
 		}
 
 		for (const anchorElement of anchorElements) {
-			if (anchorElement.getAttribute('href') === currentTargetURL.href || anchorElement.getAttribute('href') === currentTargetURL.pathname ) {
+			if (anchorElement.getAttribute('href') === currentTargetURL.href || anchorElement.getAttribute('href') === currentTargetURL.pathname) {
 				anchorElement.setAttribute('href', newHref);
 				anchorElement.style.color = "green";
 				break;
@@ -232,7 +246,7 @@ async function saveRecWrapperUsingAggReq(tagToUrlsMap) {
 	let urlsCounter = 0, downloadData, fileName, urlsToDownload = [];
 	const urlToFileNameMap = new Map();
 	for (let [tag, urls] of tagToUrlsMap) {
-		if(tag !== "p" && tag !== "P") {continue}; //TEST
+		if (tag !== "p" && tag !== "P") { continue }; //TEST
 		urlsToDownload = urlsToDownload.concat(urls[0].slice(0, urlsLimit - urlsCounter)); // (urlsLimit - urlsCounter) for limit check
 		urlsCounter += urlsToDownload.length;
 		if (urlsCounter >= urlsLimit) {
@@ -252,10 +266,10 @@ async function saveRecWrapperUsingAggReq(tagToUrlsMap) {
 		let parser = new DOMParser();
 		let parsedDom = parser.parseFromString(dom, 'text/html');
 		downloadData = await saveRecu(parsedDom, null);
-		if(downloadData.downloadComplete === false){
+		if (downloadData.downloadComplete === false) {
 			fileName = null;
 		}
-		else{
+		else {
 			fileName = downloadData.fileName;
 		}
 		urlToFileNameMap.set(urlsToDownload[i], fileName);
@@ -414,7 +428,7 @@ async function savePage(docData, frames, window = document, { autoSaveUnload, au
 	const downloadData = await sending.then((downloadData) => {
 		return downloadData;
 	}).catch(() => {
-		return {downloadComplete: false, fileName: null};
+		return { downloadComplete: false, fileName: null };
 	});
 	return downloadData;
 }
@@ -461,4 +475,42 @@ function serializeShadowRoots(node) {
 			element.appendChild(templateElement);
 		}
 	});
+}
+
+window.addEventListener("offline", function (event) {
+	handleOfflineAtRuntime();
+});
+
+async function handleOfflineAtRuntime() {
+	const currentURL = document.URL;
+	const isLocalResourceSaved = await checkIsLocalResourceInLocalStorage(currentURL);
+
+	if (isLocalResourceSaved == true) {
+		handleLocalResourceInLocalStorage(currentURL);
+	}
+	else {
+		//ignore - there is no local version of this page!
+	}
+}
+
+async function checkIsLocalResourceInLocalStorage(currentURL) {
+	const isLocalResourceSaved = await browser.runtime.sendMessage({
+		method: "offline.isLocalResourceSaved",
+		url: currentURL
+	});
+
+	return isLocalResourceSaved;
+}
+
+function handleLocalResourceInLocalStorage(currentURL) {
+	let popupAnswer = confirm("Connection has lost! fortunately NetBreak found a local version of this page. Press OK to load it.");
+	if (popupAnswer == true) {
+		browser.runtime.sendMessage({
+			method: "offline.getOnRruntime",
+			url: currentURL
+		});
+	}
+	else {
+		//ignore if cancel was pressed
+	}
 }

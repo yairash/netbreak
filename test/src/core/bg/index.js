@@ -35,6 +35,7 @@ import * as requests from "./requests.js";
 import * as tabsData from "./tabs-data.js";
 import * as tabs from "./tabs.js";
 import * as ui from "./../../ui/bg/index.js";
+import * as offline from "../bg/offline.js"
 import "./../../lib/single-file/background.js";
 
 browser.runtime.onMessage.addListener((message, sender) => {
@@ -73,6 +74,9 @@ browser.runtime.onMessage.addListener((message, sender) => {
 	}
 	if (message.method.startsWith("bootstrap.")) {
 		return bootstrap.onMessage(message, sender);
+	}
+	if (message.method.startsWith("offline.")) {
+		return offline.onMessage(message, sender);
 	}
 });
 if (browser.runtime.onMessageExternal) {
