@@ -12,16 +12,15 @@ function onMessage(message, sender) {
 	}
 }
 
-var fileList = document.getElementById("fileList");
+let fileList = document.getElementById("fileList");
 
-// Populate the list of file paths from the data.js file
-for (var i = 0; i < filePaths.length; i++) {
-	var listItem = document.createElement("li");
-	var link = document.createElement("a");
+for (let i = 0; i < filePaths.length; i++) {
+	let listItem = document.createElement("li");
+	let link = document.createElement("a");
 	let currURL = filePaths.key(i);
 	let currFilePath = filePaths[currURL];
 
-	link.href = "file://" + currFilePath; // Create the file link
+	link.href = "file://" + currFilePath; 
 	link.textContent = currURL;
 	listItem.appendChild(link);
 	fileList.appendChild(listItem);
