@@ -26,6 +26,7 @@
 import * as button from "./ui-button.js";
 import * as menus from "./ui-menus.js";
 import * as command from "./ui-commands.js";
+import * as offline from "./ui-offline-pages.js"
 
 export {
 	onMessage,
@@ -50,9 +51,13 @@ function init(businessApi) {
 }
 
 function onMessage(message, sender) {
-	if (message.method.endsWith(".refreshMenu")) {
+	if (message.method.startsWith("ui-menus")) {
 		return menus.onMessage(message, sender);
-	} else {
+	}
+	else if(message.method.startsWith("ui-offline-pages")){
+		return offline.onMessage(message, sender);
+	} 
+	else if (message.method.startsWith("ui-button")) {
 		return button.onMessage(message, sender);
 	}
 }
