@@ -96,7 +96,7 @@ function init() {
 		pageAutoSaved = false;
 		previousLocationHref = location.href;
 		browser.runtime.sendMessage({ method: "tabs.init", savedPageDetected: detectSavedPage(document) }).catch(() => { });
-		browser.runtime.sendMessage({ method: "ui.processInit" }).catch(() => { });
+		browser.runtime.sendMessage({ method: "ui-button.processInit" }).catch(() => { });
 	}
 }
 
@@ -171,6 +171,12 @@ async function setRootPageInLocalStorage(rootFileName) {
 		filePath: rootFileName
 
 	});
+
+	updateOfflinePagesPage();
+}
+
+async function updateOfflinePagesPage() {
+	browser.runtime.sendMessage({ method: "ui-offline-pages.newItemSet" });
 }
 
 async function updateRootDom(document, urlToFileNameMap) {
