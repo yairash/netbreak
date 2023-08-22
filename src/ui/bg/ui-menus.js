@@ -111,7 +111,7 @@ function init(businessApi) {
 }
 
 function onMessage(message) {
-	if (message.method.endsWith("refreshMenu")) {
+	if (message.method.endsWith(".refreshMenu")) {
 		createMenus();
 		return Promise.resolve({});
 	}

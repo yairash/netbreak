@@ -87,7 +87,7 @@ async function downloadPage(pageData, options) {
 		if (options.openSavedPage) {
 			open(URL.createObjectURL(new Blob([pageData.content], { type: "text/html" })));
 		}
-		browser.runtime.sendMessage({ method: "ui.processEnd" });
+		browser.runtime.sendMessage({ method: "ui-button.processEnd" });
 	}
 	await browser.runtime.sendMessage({ method: "downloads.end", taskId: options.taskId, hash: pageData.hash, woleetKey: options.woleetKey });
 }

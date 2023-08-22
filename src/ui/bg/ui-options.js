@@ -539,14 +539,14 @@ document.body.onchange = async event => {
 				const tabsData = await browser.runtime.sendMessage({ method: "tabsData.get" });
 				tabsData.profileName = profileNamesInput.value;
 				await browser.runtime.sendMessage({ method: "tabsData.set", tabsData: tabsData });
-				await browser.runtime.sendMessage({ method: "ui.refreshMenu" });
+				await browser.runtime.sendMessage({ method: "ui-menus.refreshMenu" });
 			}
 		} else {
 			if (target == contextMenuEnabledInput) {
-				await browser.runtime.sendMessage({ method: "ui.refreshMenu" });
+				await browser.runtime.sendMessage({ method: "ui-menus.refreshMenu" });
 			}
 			if (target == openEditorInput) {
-				await browser.runtime.sendMessage({ method: "ui.refreshMenu" });
+				await browser.runtime.sendMessage({ method: "ui-menus.refreshMenu" });
 			}
 			await refresh();
 		}
@@ -1056,7 +1056,7 @@ async function update() {
 
 async function refreshExternalComponents() {
 	try {
-		await browser.runtime.sendMessage({ method: "ui.refreshMenu" });
+		await browser.runtime.sendMessage({ method: "ui-menus.refreshMenu" });
 		if (sidePanelDisplay) {
 			await browser.runtime.sendMessage({ method: "options.refresh", profileName: profileNamesInput.value });
 		} else {

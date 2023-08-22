@@ -55,7 +55,7 @@ async function onMessage(message, sender) {
 			if (processor) {
 				processor.cancel();
 				ui.onEndPage();
-				browser.runtime.sendMessage({ method: "ui.processCancelled" });
+				browser.runtime.sendMessage({ method: "ui-button.processCancelled" });
 			}
 			if (message.options.loadDeferredImages) {
 				singlefile.processors.lazy.resetZoomLevel(message.options);
@@ -102,11 +102,11 @@ async function savePage(message) {
 			} catch (error) {
 				if (!processor.cancelled) {
 					console.error(error); // eslint-disable-line no-console
-					browser.runtime.sendMessage({ method: "ui.processError", error });
+					browser.runtime.sendMessage({ method: "ui-button.processError", error });
 				}
 			}
 		} else {
-			browser.runtime.sendMessage({ method: "ui.processCancelled" });
+			browser.runtime.sendMessage({ method: "ui-button.processCancelled" });
 		}
 		processing = false;
 		if (bootstrap) {
@@ -164,7 +164,7 @@ async function processPage(options) {
 				if (event.type == event.RESOURCE_LOADED) {
 					index++;
 				}
-				browser.runtime.sendMessage({ method: "ui.processProgress", index, maxIndex });
+				browser.runtime.sendMessage({ method: "ui-button.processProgress", index, maxIndex });
 				ui.onLoadResource(index, maxIndex, options);
 			} else if (!event.detail.frame) {
 				if (event.type == event.PAGE_LOADING) {
