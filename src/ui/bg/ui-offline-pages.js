@@ -22,6 +22,6 @@ for (let i = 0; i < filePaths.length; i++) {
 
 	link.href = "file://" + currFilePath; 
 	link.textContent = currURL;
-	listItem.appendChild(link);
-	fileList.appendChild(listItem);
+	listItem?.appendChild(link);
+	fileList?.appendChild(listItem);
 }
