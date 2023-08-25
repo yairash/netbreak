@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "undefined/subscriptions/dd3b2c09-1ef2-4689-b72b-6ec6fd725824/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/NetBreak",
-    "appService.deploySubpath": "."
-}
