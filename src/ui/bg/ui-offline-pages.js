@@ -18,10 +18,12 @@ for (let i = 0; i < filePaths.length; i++) {
 	let listItem = document.createElement("li");
 	let link = document.createElement("a");
 	let currURL = filePaths.key(i);
-	let currFilePath = filePaths[currURL];
+	let currFileDetails = JSON.parse(filePaths[currURL]);
+	let currFilePath = currFileDetails['filePath'];
+	let currFileName = currFileDetails['fileName'];
 
 	link.href = "file://" + currFilePath; 
-	link.textContent = currURL;
+	link.textContent = currFileName;
 	listItem?.appendChild(link);
 	fileList?.appendChild(listItem);
 }

@@ -12,14 +12,15 @@ async function onMessage(message, sender) {
     else if (message.method.endsWith(".setOnRuntime")) {
         const url = message.url;
         const filePath = message.filePath;
-        setLocalStorageItem(url, filePath);
+        const fileName = filePath.split(/[\\/]/).pop();
+        setLocalStorageItem(url, JSON.stringify({ filePath: filePath, fileName: fileName }));
     }
     else if (message.method.endsWith(".isLocalResourceSaved")) {
         const url = message.url;
-        if(getLocalStorageItem(url) == null){
+        if (getLocalStorageItem(url) == null) {
             return false;
         }
-        else{
+        else {
             return true;
         }
     }
@@ -28,10 +29,14 @@ async function onMessage(message, sender) {
 }
 
 function offlineModeHandler(url) {
-    const urlLocalFilePath = getLocalStorageItem(url);
-    browser.tabs.create({
-        url: `file://${urlLocalFilePath}`
-    });
+    const fileDetails = JSON.parse(getLocalStorageItem(url));
+    let filePath;
+    if (fileDetails != null) {
+        filePath = fileDetails['filePath'];
+        browser.tabs.create({
+            url: `file://${filePath}`
+        });
+    }
 
 }
 
