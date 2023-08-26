@@ -435,7 +435,7 @@ async function initialize() {
 				business.saveSelectedLinks(tab);
 			}
 			if (event.menuItemId == MENU_ID_VIEW_SAVED_PAGES) {
-				await browser.tabs.create({ active: true, url: "/src/ui/pages/offline-pages.html" });
+				await browser.tabs.create({ active: true, url: "/src/ui/pages/saved-pages.html" });
 			}
 			if (event.menuItemId == MENU_ID_SAVE_SELECTED) {
 				business.saveTabs([tab], { selected: true });

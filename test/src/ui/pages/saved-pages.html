@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Saved Pages Navigator</title>
-    <link rel="stylesheet" href="pendings.css">
+    <link rel="stylesheet" href="saved-pages.css">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark">
     <link rel="icon" href="/src/ui/resources/icon_64.png">
 </head>
+
 <body>
     <header>
-        <h1 class="title">Saved Pages Navigator</h1>
         <img class="icon" src="/src/ui/resources/icon_64.png" alt="Extension Icon">
+        <h1 class="title">Saved Pages Navigator</h1>
     </header>
     <br><br>
-    <ul id="fileList">
+    <ul id="fileList" class="gradient-list">
         <!-- The list of file paths will be dynamically added here -->
     </ul>
     <script src="/lib/chrome-browser-polyfill.js"></script>
     <script type="module" src="../bg/ui-offline-pages.js"></script>
 </body>
+
 </html>

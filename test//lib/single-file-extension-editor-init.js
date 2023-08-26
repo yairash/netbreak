@@ -1,1 +1,0 @@
-!function(e){"function"==typeof define&&define.amd?define(e):e()}((function(){"use strict";document.currentScript.remove(),function e(t){t.querySelectorAll("template[shadowroot]").forEach((t=>{let n=t.parentElement.shadowRoot;if(!n){try{n=t.parentElement.attachShadow({mode:t.getAttribute("shadowroot")}),n.innerHTML=t.innerHTML,t.remove()}catch(e){}n&&e(n)}}))}(document)}));

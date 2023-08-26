@@ -1,3 +1,0 @@
-/* localStorage */
-
-let filePaths = localStorage;
