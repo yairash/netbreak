@@ -144,7 +144,7 @@ async function autoSavePage() {
 			let filteredURLs = filterURLsByDomain(document, absoluteURLs); // map tag:urls
 			let urlToFileNameMap = new Map();
 			urlToFileNameMap = await saveRecWrapperUsingAggReq(filteredURLs); //recursive save
-			await updateRootDom(document, urlToFileNameMap);
+			const modifiedAnchorElemetns = await updateRootDom(document, urlToFileNameMap);
 			const docData = helper.preProcessDoc(document, globalThis, optionsAutoSave);
 			rootDownloadData = await savePage(docData, frames); //saving root page + extracting it's file name
 			if (framesSessionId) {
@@ -158,8 +158,15 @@ async function autoSavePage() {
 			autoSavingPage = false;
 			const rootFileName = rootDownloadData.fileName;
 			setRootPageInLocalStorage(rootFileName);
+			restoreModifiedAnchorElements(modifiedAnchorElemetns);
 		}
 
+	}
+}
+
+async function restoreModifiedAnchorElements(modifiedAnchorElemetns){
+	for (let [anchorElement, url] of modifiedAnchorElemetns) {
+		anchorElement.setAttribute('href', url);
 	}
 }
 
@@ -182,6 +189,7 @@ async function updateOfflinePagesPage() {
 async function updateRootDom(document, urlToFileNameMap) {
 	let currentTargetURL = null;
 	const anchorElements = document.getElementsByTagName('a');
+	let modifiedAnchorElemetns = new Map();
 
 	for (let [url, fileName] of urlToFileNameMap) {
 		if (fileName === null) {
@@ -197,13 +205,17 @@ async function updateRootDom(document, urlToFileNameMap) {
 		}
 
 		for (const anchorElement of anchorElements) {
-			if (anchorElement.getAttribute('href') === currentTargetURL.href || anchorElement.getAttribute('href') === currentTargetURL.pathname) {
+			let currAnchorElementHrefAttribute = anchorElement.getAttribute('href');
+			if (currAnchorElementHrefAttribute === currentTargetURL.href || currAnchorElementHrefAttribute === currentTargetURL.pathname) {
 				anchorElement.setAttribute('href', newHref);
 				anchorElement.style.color = "green";
+				modifiedAnchorElemetns.set(anchorElement, currAnchorElementHrefAttribute);
 				break;
 			}
 		}
 	}
+
+	return modifiedAnchorElemetns;
 }
 
 function extractAbsoluteURLsFromDocument(document) {

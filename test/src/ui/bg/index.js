@@ -26,7 +26,7 @@
 import * as button from "./ui-button.js";
 import * as menus from "./ui-menus.js";
 import * as command from "./ui-commands.js";
-import * as offline from "./ui-offline-pages.js"
+import * as offline from "./ui-saved-pages.js"
 
 export {
 	onMessage,
