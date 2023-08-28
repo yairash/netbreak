@@ -27,13 +27,17 @@ async function isDownloadExistsLocally(filePath, fileName, downloadId) {
 	await browser.downloads.search({ id: downloadId }).then((downloads) => {
 		for (const download of downloads) {
 			if (download.exists == true) {
-				let listItem = document.createElement("li");
-				let link = document.createElement("a");
-				link.href = "file://" + filePath;
-				link.textContent = fileName;
-				listItem?.appendChild(link);
-				fileList?.appendChild(listItem);
+				addFileToList(filePath, fileName);
 			}
 		}
 	});
+}
+
+function addFileToList(filePath, fileName) {
+	let listItem = document.createElement("li");
+	let link = document.createElement("a");
+	link.href = "file://" + filePath;
+	link.textContent = fileName;
+	listItem?.appendChild(link);
+	fileList?.appendChild(listItem);
 }
