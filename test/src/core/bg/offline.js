@@ -12,8 +12,9 @@ async function onMessage(message, sender) {
     else if (message.method.endsWith(".setOnRuntime")) {
         const url = message.url;
         const filePath = message.filePath;
+        const downloadId = message.downloadId;
         const fileName = filePath.split(/[\\/]/).pop();
-        setLocalStorageItem(url, JSON.stringify({ filePath: filePath, fileName: fileName }));
+        setLocalStorageItem(url, JSON.stringify({ filePath: filePath, fileName: fileName, downloadId: downloadId }));
     }
     else if (message.method.endsWith(".isLocalResourceSaved")) {
         const url = message.url;

@@ -1,7 +1,7 @@
-/* localStorage */
+/* localStorage, browser */
 
-export{
-    onMessage
+export {
+	onMessage
 };
 
 let filePaths = localStorage;
@@ -15,15 +15,25 @@ function onMessage(message, sender) {
 let fileList = document.getElementById("fileList");
 
 for (let i = 0; i < filePaths.length; i++) {
-	let listItem = document.createElement("li");
-	let link = document.createElement("a");
 	let currURL = filePaths.key(i);
 	let currFileDetails = JSON.parse(filePaths[currURL]);
 	let currFilePath = currFileDetails['filePath'];
 	let currFileName = currFileDetails['fileName'];
+	let currDownloadId = currFileDetails['downloadId'];
+	isDownloadExistsLocally(currFilePath, currFileName, currDownloadId);
+}
 
-	link.href = "file://" + currFilePath; 
-	link.textContent = currFileName;
-	listItem?.appendChild(link);
-	fileList?.appendChild(listItem);
+async function isDownloadExistsLocally(filePath, fileName, downloadId) {
+	await browser.downloads.search({ id: downloadId }).then((downloads) => {
+		for (const download of downloads) {
+			if (download.exists == true) {
+				let listItem = document.createElement("li");
+				let link = document.createElement("a");
+				link.href = "file://" + filePath;
+				link.textContent = fileName;
+				listItem?.appendChild(link);
+				fileList?.appendChild(listItem);
+			}
+		}
+	});
 }

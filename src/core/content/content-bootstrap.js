@@ -157,7 +157,8 @@ async function autoSavePage() {
 			pageAutoSaved = true;
 			autoSavingPage = false;
 			const rootFileName = rootDownloadData.fileName;
-			setRootPageInLocalStorage(rootFileName);
+			const downloadId = rootDownloadData.downloadId;
+			setRootPageInLocalStorage(rootFileName, downloadId);
 			restoreModifiedAnchorElements(modifiedAnchorElemetns);
 		}
 
@@ -170,13 +171,13 @@ async function restoreModifiedAnchorElements(modifiedAnchorElemetns){
 	}
 }
 
-async function setRootPageInLocalStorage(rootFileName) {
+async function setRootPageInLocalStorage(rootFileName, downloadId) {
 	const currentURL = document.URL;
 	browser.runtime.sendMessage({
 		method: "offline.setOnRuntime",
 		url: currentURL,
-		filePath: rootFileName
-
+		filePath: rootFileName,
+		downloadId: downloadId
 	});
 
 	updateOfflinePagesPage();

@@ -71,7 +71,7 @@ async function onMessage(message, sender, sendResponse) {
 		downloadId = downloadData.downloadId;
 		downloadComplete = downloadData.downloadComplete;
 		const fileName = await browser.downloads.search({ id: downloadId }).then(fileNameById, fileNameByIdOnError);
-		return {downloadComplete: downloadComplete, fileName: fileName}; //returns if download completed && the name of the downloaded file
+		return {downloadComplete: downloadComplete, fileName: fileName, downloadId: downloadId}; //returns if download completed && the name of the downloaded file
 	}
 	else if (message.method.endsWith(".fetchdom")) {
 		const doms = await fetchDomsUsingAggReq(message.server, message.urls);
