@@ -29,6 +29,12 @@ body {
 	font-family: 'Raleway', sans-serif;
 }
 
+body>header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 main {
 	display: block;
 	margin: 0 auto;
