@@ -18,7 +18,8 @@ async function onMessage(message, sender) {
     }
     else if (message.method.endsWith(".isLocalResourceSaved")) {
         const url = message.url;
-        if (getLocalStorageItem(url) == null) {
+        const downloadExists = await isDownloadExists(url);
+        if (downloadExists == false) {
             return false;
         }
         else {
@@ -38,7 +39,32 @@ function offlineModeHandler(url) {
             url: `file://${filePath}`
         });
     }
+}
 
+async function isDownloadExists(url) {
+    if (getLocalStorageItem(url) != null) {
+        const fileDetails = JSON.parse(getLocalStorageItem(url));
+        if (fileDetails == null) {
+            removeLocalStorageItem(url);
+            return false;
+        }
+        else {
+            const downloadId = fileDetails['downloadId'];
+            const downloadExists = await browser.downloads.search({ id: downloadId }).then((downloads) => {
+                for (const download of downloads) {
+                    return download.exists;
+                }
+            });
+
+            if (downloadExists == false) {
+                removeLocalStorageItem(url);
+            }
+            return downloadExists;
+        }
+    }
+    else {
+        return false;
+    }
 }
 
 function getLocalStorageItem(key) {

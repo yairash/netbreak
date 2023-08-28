@@ -156,16 +156,24 @@ async function autoSavePage() {
 			}
 			pageAutoSaved = true;
 			autoSavingPage = false;
-			const rootFileName = rootDownloadData.fileName;
-			const downloadId = rootDownloadData.downloadId;
-			setRootPageInLocalStorage(rootFileName, downloadId);
+
+			handleDownloadComplete(rootDownloadData);
 			restoreModifiedAnchorElements(modifiedAnchorElemetns);
 		}
 
 	}
 }
 
-async function restoreModifiedAnchorElements(modifiedAnchorElemetns){
+function handleDownloadComplete(rootDownloadData) {
+	const downloadComplete = rootDownloadData.downloadComplete;
+	if (downloadComplete == true) {
+		const rootFileName = rootDownloadData.fileName;
+		const downloadId = rootDownloadData.downloadId;
+		setRootPageInLocalStorage(rootFileName, downloadId);
+	}
+}
+
+async function restoreModifiedAnchorElements(modifiedAnchorElemetns) {
 	for (let [anchorElement, url] of modifiedAnchorElemetns) {
 		anchorElement.setAttribute('href', url);
 	}
